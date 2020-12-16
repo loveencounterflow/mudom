@@ -86,7 +86,7 @@ class Micro_dom # extends Multimix
       style          += "width:100%;"
       style          += "max-height:30mm;"
       style          += "overflow-y:scroll;"
-      message_box     = @parse_one "<div id=${id} style='${style}'></div>"
+      message_box     = @parse_one "<div id=#{id} style='#{style}'></div>"
       @append ( @select 'body' ), message_box
     message_p       = "<p style='padding-top:3mm;'>"
     message_p      += "⚠️&nbsp;<strong>"
@@ -120,7 +120,7 @@ class Micro_dom # extends Multimix
     validate.delement element
     validate.nonempty_text selector
     unless ( R = element.querySelector selector )?
-      throw new Error "^µDOM/select_from@7758^ no such element: ${µ.TEXT.rpr selector}" if fallback is misfit
+      throw new Error "^µDOM/select_from@7758^ no such element: #{µ.TEXT.rpr selector}" if fallback is misfit
       return fallback
     return R
 
