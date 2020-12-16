@@ -38,9 +38,9 @@ class Micro_text
 
   #---------------------------------------------------------------------------------------------------------
   _pen_escape1: ( x ) ->
-    return this._escape x           if isa.text     x
-    return this._escape x.outerHTML if isa.element  x
-    return this.rpr x
+    return @_escape x           if isa.text     x
+    return @_escape x.outerHTML if isa.element  x
+    return @rpr x
 
   #---------------------------------------------------------------------------------------------------------
   _escape: ( x ) -> x.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' )
