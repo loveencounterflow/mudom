@@ -52,6 +52,8 @@ class Micro_dom # extends Multimix
   ### inspired by http://youmightnotneedjquery.com
   and https://blog.garstasio.com/you-dont-need-jquery ###
 
+  #=========================================================================================================
+  #
   #---------------------------------------------------------------------------------------------------------
   ready: ( f ) ->
     # thx to https://stackoverflow.com/a/7053197/7568091
@@ -59,12 +61,54 @@ class Micro_dom # extends Multimix
     validate.function f
     return ( setTimeout ( => @ready f ), 9 ) if /in/.test document.readyState
     return f()
-# thx to https://codetonics.com/javascript/detect-document-ready/
-# function ready(callbackFunction){
-#   if(document.readyState != 'loading')
-#     callbackFunction(event)
-#   else
-#     document.addEventListener("DOMContentLoaded", callbackFunction)}
+
+
+  #=========================================================================================================
+  # WARNINGS, NOTIFICATIONS
+  #---------------------------------------------------------------------------------------------------------
+  _notify: ( message ) ->
+    id          = 'msgbx49573'
+    message_box = @select "#{id}", null
+    if message_box is null
+      style           = "background:#18171d;"
+      style          += "position:fixed;"
+      style          += "bottom:0mm;"
+      style          += "border:1mm dashed #e2ff00;"
+      style          += "padding-left:3mm;"
+      style          += "padding-right:3mm;"
+      style          += "padding-bottom:3mm;"
+      style          += "font-family:sans-serif;"
+      style          += "font-weight:bold !important;"
+      style          += "font-size:3mm;"
+      style          += "color:#e2ff00;"
+      style          += "width:100%;"
+      style          += "max-height:30mm;"
+      style          += "overflow-y:scroll;"
+      message_box     = @parse_one "<div id=${id} style='${style}'></div>"
+      @append ( @select 'body' ), message_box
+    message_p       = "<p style='padding-top:3mm;'>"
+    message_p      += "⚠️&nbsp;<strong>"
+    message_p      += µ.TEXT.pen_escape message
+    message_p      += "</strong></p>"
+    message_p       = @parse_one message_p
+    @insert_as_last message_box, message_p
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  warn: ( P... ) ->
+    ### Construct a text message for display in console and in notification box, alongside with a stack trace
+    to be shown only in the console, preced by the original arguments as passed into this function,
+    meaning that any DOM elements will be expandable links to their visible representations on the HTML
+    page. ###
+    message = µ.TEXT.pen P...
+    error   = new Error message
+    console.groupCollapsed P[ 0 ]
+    console.warn P...
+    console.groupEnd()
+    @_notify message
+
+  #=========================================================================================================
+  #
   #---------------------------------------------------------------------------------------------------------
   select:     ( selector, fallback = misfit ) -> @select_from     document, selector, fallback
   select_all: ( selector                    ) -> @select_all_from document, selector
