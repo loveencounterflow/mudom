@@ -1,7 +1,9 @@
 
 'use strict'
+loupe                     = require '../loupe.js'
 misfit                    = Symbol 'misfit'
 types                     = new ( require 'intertype' ).Intertype()
+debug                     = console.debug
 { isa
   validate
   declare }               = types.export()
