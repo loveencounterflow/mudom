@@ -6,8 +6,8 @@
     "../src/index.coffee"
   ],
   "names": [],
-  "mappings": "AAAA;EAAA;EAEG,CAAA,CAAA,CAAA,GAAA;AACH,QAAA;IAAE,CAAA,GAAI,OAAA,CAAQ,WAAR;IACJ,IAAG,yBAAH;MACE,UAAU,CAAC,CAAX,GAAe,EADjB;KAAA,MAAA;MAGE,MAAM,CAAC,OAAP,GAAiB,EAHnB;;AAIA,WAAO;EANN,CAAA;AAFH",
+  "mappings": "AAAA;EAAA;EAEG,CAAA,CAAA,CAAA,GAAA;AACH,QAAA;IAAE,CAAA,CAAE,CAAF,CAAA,GAAS,OAAA,CAAQ,WAAR,CAAT;IACA,OAAO,CAAC,GAAR,CAAY,QAAZ,EAAsB,CAAtB;IACA,IAAG,yBAAH;MACE,UAAU,CAAC,CAAX,GAAe,EADjB;KAAA,MAAA;MAGE,MAAM,CAAC,OAAP,GAAiB,EAHnB;;AAIA,WAAO;EAPN,CAAA;AAFH",
   "sourcesContent": [
-    "'use strict'\n\ndo =>\n  µ = require './main.js'\n  if globalThis.window?\n    globalThis.µ = µ\n  else\n    module.exports = µ\n  return null\n\n"
+    "'use strict'\n\ndo =>\n  { µ, } = require './main.js'\n  console.log '^0082^', µ\n  if globalThis.window?\n    globalThis.µ = µ\n  else\n    module.exports = µ\n  return null\n\n"
   ]
 }

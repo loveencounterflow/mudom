@@ -3,7 +3,8 @@
   'use strict';
   (() => {
     var µ;
-    µ = require('./main.js');
+    ({µ} = require('./main.js'));
+    console.log('^0082^', µ);
     if (globalThis.window != null) {
       globalThis.µ = µ;
     } else {
@@ -22,21 +23,11 @@
 
   misfit = Symbol('misfit');
 
-  types = require('intertype');
+  types = new (require('intertype')).Intertype();
 
   ({isa, validate, declare} = types.export());
 
-  //===========================================================================================================
-  /* TAINT probably not correct to only check for Element, at least in some cases could be Node as well */
-  declare('delement', function(x) {
-    return (x === document) || (x instanceof Element);
-  });
-
-  declare('element', function(x) {
-    return x instanceof Element;
-  });
-
-  //===========================================================================================================
+  //-----------------------------------------------------------------------------------------------------------
   name_of_match_method = (function() {
     var element, i, len, name, ref;
     element = document.createElement('div');
@@ -50,6 +41,18 @@
     }
     return null;
   })();
+
+  //===========================================================================================================
+  // TYPES
+  //-----------------------------------------------------------------------------------------------------------
+  /* TAINT probably not correct to only check for Element, at least in some cases could be Node as well */
+  declare('delement', function(x) {
+    return (x === document) || (x instanceof Element);
+  });
+
+  declare('element', function(x) {
+    return x instanceof Element;
+  });
 
   //===========================================================================================================
 
@@ -430,7 +433,7 @@
       on(element, name, handler) {
         /* TAINT add options */
         /* see http://youmightnotneedjquery.com/#on, http://youmightnotneedjquery.com/#delegate */
-        validate.element(element);
+        validate.delement(element);
         validate.nonempty_text(name);
         validate.function(handler);
         return element.addEventListener(name, handler, false);
@@ -501,9 +504,14 @@
 
   }).call(this);
 
+  //===========================================================================================================
+  // EXPORTS
+  //-----------------------------------------------------------------------------------------------------------
   if ((base = module.exports).µ == null) {
     base.µ = {};
   }
+
+  module.exports.µ._magic = Symbol.for('µDOM');
 
   module.exports.µ.TEXT = new Micro_text();
 
