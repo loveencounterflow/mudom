@@ -118,7 +118,7 @@ class Micro_dom # extends Multimix
     validate.delement element
     validate.nonempty_text selector
     unless ( R = element.querySelector selector )?
-      throw new Error "^µDOM/select_from@7758^ no such element: #{µ.rpr selector}" if fallback is misfit
+      throw new Error "^µDOM/select_from@7758^ no such element: ${µ.TEXT.rpr selector}" if fallback is misfit
       return fallback
     return R
 
@@ -133,30 +133,31 @@ class Micro_dom # extends Multimix
   select_id:  ( id, fallback = misfit ) ->
     validate.nonempty_text id
     unless ( R = document.getElementById id )?
-      throw new Error "^µDOM/select_id@7758^ no element with ID: #{µ.rpr id}" if fallback is misfit
+      throw new Error "^µDOM/select_id@7758^ no element with ID: #{µ.TEXT.rpr id}" if fallback is misfit
       return fallback
     return R
 
   #---------------------------------------------------------------------------------------------------------
   matches_selector: ( element, selector ) ->
     validate.nonempty_text selector
-    validate.element element
+    validate.delement element
     return element[ name_of_match_method ] selector
 
   #---------------------------------------------------------------------------------------------------------
-  get:              ( element, name         ) -> validate.element element; element.getAttribute name
-  set:              ( element, name, value  ) -> validate.element element; element.setAttribute name, value
+  get:              ( element, name             ) -> validate.element element; element.getAttribute name
+  # When called with two arguments as in `set div, 'bar'`, will set values-less attribute (`<div bar>`)
+  set:              ( element, name, value = '' ) -> validate.element element; element.setAttribute name, value
   #---------------------------------------------------------------------------------------------------------
-  get_classes:      ( element               ) -> validate.element element; element.classList
-  add_class:        ( element, name         ) -> validate.element element; element.classList.add      name
-  has_class:        ( element, name         ) -> validate.element element; element.classList.contains name
-  remove_class:     ( element, name         ) -> validate.element element; element.classList.remove   name
-  toggle_class:     ( element, name         ) -> validate.element element; element.classList.toggle   name
+  get_classes:      ( element                   ) -> validate.element element; element.classList
+  add_class:        ( element, name             ) -> validate.element element; element.classList.add      name
+  has_class:        ( element, name             ) -> validate.element element; element.classList.contains name
+  remove_class:     ( element, name             ) -> validate.element element; element.classList.remove   name
+  toggle_class:     ( element, name             ) -> validate.element element; element.classList.toggle   name
   #---------------------------------------------------------------------------------------------------------
-  hide:             ( element               ) -> validate.element element; element.style.display = 'none'
-  show:             ( element               ) -> validate.element element; element.style.display = ''
+  hide:             ( element                   ) -> validate.element element; element.style.display = 'none'
+  show:             ( element                   ) -> validate.element element; element.style.display = ''
   #---------------------------------------------------------------------------------------------------------
-  get_live_styles:  ( element               ) -> getComputedStyle element ### validation done by method ###
+  get_live_styles:  ( element                   ) -> getComputedStyle element ### validation done by method ###
   ###
   globalThis.get_style = ( element, pseudo_selector, attribute_name ) ->
     unless attribute_name?
@@ -165,7 +166,7 @@ class Micro_dom # extends Multimix
     return style.getPropertyValue attribute_name
   ###
   ### TAINT also use pseudo_selector, see above ###
-  get_style_rule:   ( element, name         ) -> ( getComputedStyle element )[ name ] ### validation done by method ###
+  get_style_rule:   ( element, name             ) -> ( getComputedStyle element )[ name ] ### validation done by method ###
 
   #---------------------------------------------------------------------------------------------------------
   set_style_rule:   ( element, name, value  ) ->
@@ -228,7 +229,7 @@ class Micro_dom # extends Multimix
       when 'as_first',  'afterbegin'  then return @insert_as_first target, x
       when 'as_last',   'beforeend'   then return @insert_as_last  target, x
       when 'after',     'afterend'    then return @insert_after    target, x
-    throw new Error "^µDOM/insert@7758^ not a valid position: #{µ.rpr position}"
+    throw new Error "^µDOM/insert@7758^ not a valid position: #{µ.TEXT.rpr position}"
 
   #---------------------------------------------------------------------------------------------------------
   ### NOTE pending practical considerations and benchmarks we will probably remove one of the two sets
@@ -282,6 +283,10 @@ class Micro_dom # extends Multimix
   on: ( element, name, handler ) ->
     ### TAINT add options ###
     ### see http://youmightnotneedjquery.com/#on, http://youmightnotneedjquery.com/#delegate ###
+    ### Also note the addition of a `passive: false` parameter (as in `html_dom.addEventListener 'wheel', f,
+    { passive: false, }`); see https://stackoverflow.com/a/55461632/256361; apparently it is a recently
+    introduced feature of browser event processing; see also [JQuery issue #2871 *Add support for passive
+    event listeners*](https://github.com/jquery/jquery/issues/2871), open as of Dec 2020 ###
     validate.delement element
     validate.nonempty_text name
     validate.function handler
@@ -290,6 +295,10 @@ class Micro_dom # extends Multimix
   #---------------------------------------------------------------------------------------------------------
   emit_custom_event: ( name, options ) ->
     # thx to https://www.javascripttutorial.net/javascript-dom/javascript-custom-events/
+    ### Acc. to https://developer.mozilla.org/en-US/docs/Web/API/Event/Event,
+    https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent, allowable fields for `options`
+    include `bubbles`, `cancelable`, `composed`, `detail`; the last one may contain arbitrary data and can
+    be retrieved as `event.detail`. ###
     validate.nonempty_text name
     document.dispatchEvent new CustomEvent name, options
 
