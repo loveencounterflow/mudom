@@ -1,20 +1,12 @@
 
 'use strict'
-
-misfit                = Symbol 'misfit'
-types                 = require 'intertype'
+misfit                    = Symbol 'misfit'
+types                     = new ( require 'intertype' ).Intertype()
 { isa
   validate
-  declare }           = types.export()
-
-#===========================================================================================================
-### TAINT probably not correct to only check for Element, at least in some cases could be Node as well ###
-declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )
-declare 'element',        ( x ) -> x instanceof Element
-
-
-#===========================================================================================================
-name_of_match_method  = do ->
+  declare }               = types.export()
+#-----------------------------------------------------------------------------------------------------------
+name_of_match_method      = do ->
   element = document.createElement 'div'
   for name in [ 'matches', 'matchesSelector', 'msMatchesSelector', \
     'mozMatchesSelector', 'webkitMatchesSelector', 'oMatchesSelector', ]
@@ -22,6 +14,15 @@ name_of_match_method  = do ->
       ### TAINT remove element? ###
       return name
   return null
+
+
+#===========================================================================================================
+# TYPES
+#-----------------------------------------------------------------------------------------------------------
+### TAINT probably not correct to only check for Element, at least in some cases could be Node as well ###
+declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )
+declare 'element',        ( x ) -> x instanceof Element
+
 
 
 #===========================================================================================================
@@ -237,7 +238,7 @@ class Micro_dom # extends Multimix
   on: ( element, name, handler ) ->
     ### TAINT add options ###
     ### see http://youmightnotneedjquery.com/#on, http://youmightnotneedjquery.com/#delegate ###
-    validate.element element
+    validate.delement element
     validate.nonempty_text name
     validate.function handler
     return element.addEventListener name, handler, false
@@ -288,10 +289,11 @@ class Micro_dom # extends Multimix
     return null
 
 
-
-
-
+#===========================================================================================================
+# EXPORTS
+#-----------------------------------------------------------------------------------------------------------
 module.exports.µ       ?= {}
+module.exports.µ._magic = Symbol.for 'µDOM'
 module.exports.µ.TEXT   = new Micro_text()
 module.exports.µ.DOM    = new Micro_dom()
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
