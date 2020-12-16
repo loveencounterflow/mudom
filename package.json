@@ -1,0 +1,25 @@
+{
+  "name": "mudom",
+  "version": "1.0.0",
+  "description": "µDOM utilities",
+  "main": "lib/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loveencounterflow/mudom.git"
+  },
+  "keywords": [
+    "dom",
+    "jquery",
+    "µdom",
+    "frontend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/loveencounterflow/mudom/issues"
+  },
+  "homepage": "https://github.com/loveencounterflow/mudom#readme"
+}
