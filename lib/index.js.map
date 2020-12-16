@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "",
+  "sourceRoot": "",
+  "sources": [
+    "../src/index.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;EAAA;EAEG,CAAA,CAAA,CAAA,GAAA;AACH,QAAA;IAAE,CAAA,GAAI,OAAA,CAAQ,WAAR;IACJ,IAAG,yBAAH;MACE,UAAU,CAAC,CAAX,GAAe,EADjB;KAAA,MAAA;MAGE,MAAM,CAAC,OAAP,GAAiB,EAHnB;;AAIA,WAAO;EANN,CAAA;AAFH",
+  "sourcesContent": [
+    "'use strict'\n\ndo =>\n  µ = require './main.js'\n  if globalThis.window?\n    globalThis.µ = µ\n  else\n    module.exports = µ\n  return null\n\n"
+  ]
+}
