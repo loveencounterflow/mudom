@@ -350,6 +350,7 @@ class Dom # extends Multimix
 @_magic = Symbol.for 'µDOM'
 @TEXT   = new Text()
 @DOM    = new Dom()
+@KB     = require '../µ.keyboard-modifier-emitter.js'
 
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
 # module.exports.log     ?= module.exports.µ.TEXT.log.bind( µ.TEXT )
