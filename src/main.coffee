@@ -345,12 +345,11 @@ class Dom # extends Multimix
 
 
 #===========================================================================================================
-# EXPORTS
+# MAGIC
 #-----------------------------------------------------------------------------------------------------------
-@µ =
-  _magic:   Symbol.for 'µDOM'
-  TEXT:     new Text()
-  DOM:      new Dom()
+@_magic = Symbol.for 'µDOM'
+@TEXT   = new Text()
+@DOM    = new Dom()
 
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
 # module.exports.log     ?= module.exports.µ.TEXT.log.bind( µ.TEXT )
