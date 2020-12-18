@@ -30,7 +30,7 @@ declare 'element',        ( x ) -> x instanceof Element
 #===========================================================================================================
 #
 #-----------------------------------------------------------------------------------------------------------
-class Micro_text
+class Text
   #---------------------------------------------------------------------------------------------------------
   rpr:          ( x     ) -> loupe.inspect x
   _pen1:        ( x     ) -> if isa.text x then x else @rpr x
@@ -50,7 +50,7 @@ class Micro_text
 #===========================================================================================================
 #
 #-----------------------------------------------------------------------------------------------------------
-class Micro_dom # extends Multimix
+class Dom # extends Multimix
   ### inspired by http://youmightnotneedjquery.com
   and https://blog.garstasio.com/you-dont-need-jquery ###
 
@@ -347,10 +347,11 @@ class Micro_dom # extends Multimix
 #===========================================================================================================
 # EXPORTS
 #-----------------------------------------------------------------------------------------------------------
-module.exports.µ       ?= {}
-module.exports.µ._magic = Symbol.for 'µDOM'
-module.exports.µ.TEXT   = new Micro_text()
-module.exports.µ.DOM    = new Micro_dom()
+@µ =
+  _magic:   Symbol.for 'µDOM'
+  TEXT:     new Text()
+  DOM:      new Dom()
+
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
 # module.exports.log     ?= module.exports.µ.TEXT.log.bind( µ.TEXT )
 
