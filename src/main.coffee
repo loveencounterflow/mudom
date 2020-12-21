@@ -63,6 +63,10 @@ class Dom # extends Multimix
     id          = 'msgbx49573'
     message_box = @select "#{id}", null
     if message_box is null
+      body            = @select 'body', null
+      ### TAINT body element cannot be found when method is called before document ready, but we could still
+      construct element immediately, append it on document ready ###
+      return unless body?
       style           = "background:#18171d;"
       style          += "position:fixed;"
       style          += "bottom:0mm;"
@@ -78,7 +82,7 @@ class Dom # extends Multimix
       style          += "max-height:30mm;"
       style          += "overflow-y:scroll;"
       message_box     = @parse_one "<div id=#{id} style='#{style}'></div>"
-      @append ( @select 'body' ), message_box
+      @append body, message_box
     message_p       = "<p style='padding-top:3mm;'>"
     message_p      += "⚠️&nbsp;<strong>"
     message_p      += µ.TEXT.pen_escape message
