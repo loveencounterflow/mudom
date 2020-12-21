@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "",
+  "sourceRoot": "",
+  "sources": [
+    "../src/types.coffee"
+  ],
+  "names": [],
+  "mappings": "AAEA;EAAA;EAEA,IAAC,CAAA,KAAD,GAA4B,IAAI,CAAE,OAAA,CAAQ,WAAR,CAAF,CAAuB,CAAC,SAA5B,CAAA;;EAC5B,MAAM,CAAC,MAAP,CAAc,IAAd,EAAiB,IAAC,CAAA,KAAK,CAAC,MAAP,CAAA,CAAjB,EAHA;;;;;;;;EAWA,IAAC,CAAA,OAAD,CAAS,kBAAT,EAA6B;IAAA,KAAA,EAC3B;MAAA,qDAAA,EAAuD,QAAA,CAAE,CAAF,CAAA;eAAS,MAAO,UAAP,MAAe,YAAf,MAAyB,YAAzB,MAAmC,QAAnC,MAAyC;MAAlD;IAAvD;EAD2B,CAA7B,EAXA;;;;;;;;EAoBA,IAAC,CAAA,OAAD,CAAS,kBAAT,EAA6B;IAAA,KAAA,EAC3B;MAAA,sBAAA,EAA6B,QAAA,CAAE,CAAF,CAAA;eAAS,IAAC,CAAA,GAAG,CAAC,aAAL,CAAmB,CAAnB;MAAT;IAA7B;EAD2B,CAA7B,EApBA;;;;EAyBA,IAAC,CAAA,OAAD,CAAS,UAAT,EAA2B,QAAA,CAAE,CAAF,CAAA;WAAS,CAAE,CAAA,KAAK,QAAP,CAAA,IAAqB,CAAE,CAAA,YAAa,OAAf;EAA9B,CAA3B;;EACA,IAAC,CAAA,OAAD,CAAS,SAAT,EAA2B,QAAA,CAAE,CAAF,CAAA;WAAS,CAAA,YAAa;EAAtB,CAA3B;AA1BA",
+  "sourcesContent": [
+    "\n\n'use strict'\n\n@types                    = new ( require 'intertype' ).Intertype()\nObject.assign @, @types.export()\n\n# #-----------------------------------------------------------------------------------------------------------\n# @declare 'keywatch_keytypes', tests:\n#   \"x is a list of keywatch_keytype\":     ( x ) -> @isa.list_of 'keywatch_keytype', x\n#   \"x is not empty\":                   ( x ) -> not @isa.empty x\n\n#-----------------------------------------------------------------------------------------------------------\n@declare 'keywatch_keytype', tests:\n  \"x is one of 'push', 'toggle', 'double', 'up', 'down\": ( x ) -> x in [ 'push', 'toggle', 'double', 'up', 'down', ]\n\n# #-----------------------------------------------------------------------------------------------------------\n# @declare 'keywatch_keynames', tests:\n#   \"x is a list of keywatch_keyname\":  ( x ) -> @isa.list_of 'keywatch_keyname', x\n#   \"x is not empty\":                   ( x ) -> not @isa.empty x\n\n#-----------------------------------------------------------------------------------------------------------\n@declare 'keywatch_keyname', tests:\n  \"x is a nonempty_text\":      ( x ) -> @isa.nonempty_text x\n\n#-----------------------------------------------------------------------------------------------------------\n### TAINT probably not correct to only check for Element, at least in some cases could be Node as well ###\n@declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )\n@declare 'element',        ( x ) -> x instanceof Element\n\n\n"
+  ]
+}
