@@ -8,6 +8,11 @@
 log                       = console.log
 debug                     = console.debug
 freeze                    = Object.freeze
+{ types
+  isa
+  validate
+  validate_optional }     = require './types'
+
 #-----------------------------------------------------------------------------------------------------------
 defaults                  =
 

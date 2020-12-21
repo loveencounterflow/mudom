@@ -2,11 +2,11 @@
 'use strict'
 loupe                     = require '../loupe.js'
 misfit                    = Symbol 'misfit'
-types                     = new ( require 'intertype' ).Intertype()
 debug                     = console.debug
-{ isa
-  validate
-  declare }               = types.export()
+{ types
+  isa
+  validate }              = require './types'
+
 #-----------------------------------------------------------------------------------------------------------
 name_of_match_method      = do ->
   element = document.createElement 'div'
@@ -16,15 +16,6 @@ name_of_match_method      = do ->
       ### TAINT remove element? ###
       return name
   return null
-
-
-#===========================================================================================================
-# TYPES
-#-----------------------------------------------------------------------------------------------------------
-### TAINT probably not correct to only check for Element, at least in some cases could be Node as well ###
-declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )
-declare 'element',        ( x ) -> x instanceof Element
-
 
 
 #===========================================================================================================
