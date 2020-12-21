@@ -147,6 +147,10 @@ class Dom # extends Multimix
   remove_class:     ( element, name             ) -> validate.element element; element.classList.remove   name
   toggle_class:     ( element, name             ) -> validate.element element; element.classList.toggle   name
   #---------------------------------------------------------------------------------------------------------
+  swap_class: ( element, old_name, new_name ) ->
+    element.classList.remove  old_name
+    element.classList.add     new_name
+  #---------------------------------------------------------------------------------------------------------
   hide:             ( element                   ) -> validate.element element; element.style.display = 'none'
   show:             ( element                   ) -> validate.element element; element.style.display = ''
   #---------------------------------------------------------------------------------------------------------
