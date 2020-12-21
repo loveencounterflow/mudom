@@ -42,6 +42,7 @@ defaults                  =
     'Control',
     'Meta',
     'Shift',
+    'CapsLock',
     # ------------- Tier B: status doubtful
     # 'Hyper',
     # 'OS',
@@ -49,7 +50,6 @@ defaults                  =
     # 'Symbol',
     # ------------- Tier C: rare, not needed, or not sensed by JS
     # 'Fn',
-    # 'CapsLock',
     # 'FnLock',
     # 'NumLock',
     # 'ScrollLock',
@@ -70,7 +70,10 @@ class @Kb
     return null
 
   _prv_modifiers: {}
-  _caps_lock_pressed: false
+  _capslock_active: false
+
+  #---------------------------------------------------------------------------------------------------------
+  @_registry: null
 
   #---------------------------------------------------------------------------------------------------------
   ### Get the last known keyboard modifier state. NOTE may be extended with `event` argument ITF. ###
@@ -97,40 +100,71 @@ class @Kb
 #   freeze( @_prv_modifiers )
 
   #---------------------------------------------------------------------------------------------------------
-  _set_verdict: ( value ) =>
-    # console.log('^22928^', µ.DOM.get_kb_modifier_state() )
-    if ( value )
-      µ.DOM.emit_custom_event 'µ_kb_capslock_active'
-      @_caps_lock_pressed = true
-    else
-      µ.DOM.emit_custom_event 'µ_kb_capslock_inactive'
-      @_caps_lock_pressed = false
+  _set_capslock_state: ( capslock_active ) =>
+    return null if capslock_active is @_capslock_active
+    @_capslock_active = capslock_active
+    µ.DOM.emit_custom_event 'µ_kb_capslock_changed', { detail: { CapsLock: capslock_active, }, }
     return null
+
+  # #---------------------------------------------------------------------------------------------------------
+  # on_push: ( keynames, handler ) =>
+    # keynames  = [ keynames, ] unless isa.list keynames
+    # types     = [ types,    ] unless isa.list types
+    # validate.keywatch_keynames  keynames
+    # validate.keywatch_types     types
+
+  #---------------------------------------------------------------------------------------------------------
+  _XXX_initialized = false
+  _listen_to_key: ( name, type, listener ) =>
+    do =>
+      if name? then validate.keywatch_keyname name else name = ''
+      if type? then validate.keywatch_keytype type else type = ''
+      # debug '^90009^', name + "\x00" + type
+      tag       = "#{type}:#{name}"
+      registry  = @_registry         ?= {}
+      listeners = registry[ tag ]    ?= []
+      listeners.push listener
+    #.......................................................................................................
+    # throw new Error '^493841^' unless type is 'down'
+    return null if _XXX_initialized
+    _XXX_initialized = true
+    debug '^2252^', "binding keydown"
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      name = event.key
+      type = 'down'
+      d       = freeze { name, type, event, }
+      for tag in [ "#{type}:#{name}", "#{type}:", ":#{event.key}", ":", ]
+        continue unless ( listeners = @_registry[ tag ] )?
+        listener d for listener in listeners
+      return null
+    return null ### NOTE may return a `remove_listener` method ITF ###
 
   #---------------------------------------------------------------------------------------------------------
   XXXXXXXXXXXX_foobar: =>
     #.......................................................................................................
     handle_kblike_event = ( event ) =>
       modifier_state = @get_changed_kb_modifier_state event
-      debug '^2287001^', { modifier_state, }
       if ( modifier_state != null )
         µ.DOM.emit_custom_event 'µ_kb_modifier_changed', { detail: modifier_state, }
-      @_set_verdict event.getModifierState 'CapsLock'
+      @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     #.......................................................................................................
     for event_name in @cfg.kblike_eventnames
       µ.DOM.on document, event_name, handle_kblike_event
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) =>
+      handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
       ### TAINT logic is questionable ###
-      if ( event.key is 'CapsLock' ) then @_set_verdict not @_caps_lock_pressed
-      else                                @_set_verdict event.getModifierState 'CapsLock'
+      if ( event.key is 'CapsLock' ) then @_set_capslock_state not @_capslock_active
+      else                                @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     #.......................................................................................................
     µ.DOM.on document, 'keyup', ( event ) =>
+      handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
       ### TAINT logic is questionable ###
       return null if event.key is 'CapsLock'
-      @_set_verdict event.getModifierState 'CapsLock'
+      @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     return null
 
