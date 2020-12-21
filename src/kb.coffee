@@ -73,9 +73,6 @@ class @Kb
   _capslock_active: false
 
   #---------------------------------------------------------------------------------------------------------
-  @_registry: null
-
-  #---------------------------------------------------------------------------------------------------------
   ### Get the last known keyboard modifier state. NOTE may be extended with `event` argument ITF. ###
   # µ.DOM.get_kb_modifier_state = () => return { ...prv, }
 
@@ -114,33 +111,6 @@ class @Kb
     # validate.keywatch_types     types
 
   #---------------------------------------------------------------------------------------------------------
-  _XXX_initialized = false
-  _listen_to_key: ( name, type, listener ) =>
-    do =>
-      if name? then validate.keywatch_keyname name else name = ''
-      if type? then validate.keywatch_keytype type else type = ''
-      # debug '^90009^', name + "\x00" + type
-      tag       = "#{type}:#{name}"
-      registry  = @_registry         ?= {}
-      listeners = registry[ tag ]    ?= []
-      listeners.push listener
-    #.......................................................................................................
-    # throw new Error '^493841^' unless type is 'down'
-    return null if _XXX_initialized
-    _XXX_initialized = true
-    debug '^2252^', "binding keydown"
-    #.......................................................................................................
-    µ.DOM.on document, 'keydown', ( event ) =>
-      name = event.key
-      type = 'down'
-      d       = freeze { name, type, event, }
-      for tag in [ "#{type}:#{name}", "#{type}:", ":#{event.key}", ":", ]
-        continue unless ( listeners = @_registry[ tag ] )?
-        listener d for listener in listeners
-      return null
-    return null ### NOTE may return a `remove_listener` method ITF ###
-
-  #---------------------------------------------------------------------------------------------------------
   XXXXXXXXXXXX_foobar: =>
     #.......................................................................................................
     handle_kblike_event = ( event ) =>
@@ -168,5 +138,86 @@ class @Kb
       return null
     return null
 
+  ##########################################################################################################
+  ##########################################################################################################
+  ##########################################################################################################
+  ##########################################################################################################
+  ##########################################################################################################
+  ##########################################################################################################
 
+  #---------------------------------------------------------------------------------------------------------
+  _registry:          {}
+  _initialized_types: {}
+
+  #---------------------------------------------------------------------------------------------------------
+  # µ_DOM_detect_doublekey_events { event_name: 'µKB_doublekey', dt: 350, }
+  _detect_doublekey_events: ( cfg, handler ) =>
+    defaults  = { dt: 350, }
+    cfg       = { defaults..., cfg..., }
+    shreg     = []
+    #.......................................................................................................
+    get_double_key = ->
+      return false unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < cfg.dt
+      return false unless shreg[ 0 ]?.dir   is 'down'
+      return false unless shreg[ 1 ]?.dir   is 'up'
+      return false unless shreg[ 2 ]?.dir   is 'down'
+      return false unless shreg[ 3 ]?.dir   is 'up'
+      return false unless shreg[ 0 ]?.name  is shreg[ 1 ]?.name is shreg[ 2 ]?.name is shreg[ 3 ]?.name
+      R             = shreg[ 3 ].name
+      shreg.length  = 0
+      return R
+    #.......................................................................................................
+    shift = -> shreg.shift()
+    push = ( dir, event ) ->
+      name = event.key
+      shreg.push { dir, name, t: Date.now(), }
+      shreg.shift() while shreg.length > 4
+      if name = get_double_key()
+        handler event
+      return null
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) => push 'down', event
+    µ.DOM.on document, 'keyup',   ( event ) => push 'up',   event
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key: ( name, type, handler ) =>
+    ### NOTE catch-all bindings to be implemented later ###
+    # if name? then validate.keywatch_keyname name else name = ''
+    # if type? then validate.keywatch_keytype type else type = ''
+    validate.keywatch_keyname name
+    validate.keywatch_keytype type
+    tag       = "#{type}:#{name}"
+    handlers  = @_registry[ tag ] ?= []
+    handlers.push handler
+    @_add_listener_for_type type
+    #.......................................................................................................
+    return null ### NOTE may return a `remove_listener` method ITF ###
+
+  #---------------------------------------------------------------------------------------------------------
+  _call_handlers: ( type, event ) =>
+    name  = event.key
+    d     = freeze { name, type, event, }
+    ### TAINT avoid to iterate over tags like `':'`, `'down:'` if they are known not to be used ###
+    # for tag in [ "#{type}:#{name}", "#{type}:", ":#{event.key}", ":", ]
+    for tag in [ "#{type}:#{event.key}", ]
+      continue unless ( handlers = @_registry[ tag ] )?
+      handler d for handler in handlers
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _add_listener_for_type: ( type ) ->
+    return null if @_initialized_types[ type ]
+    @_initialized_types[ type ] = true
+    debug '^2252^', "binding type #{type}"
+    #.......................................................................................................
+    switch type
+      when 'up', 'down'
+        event_name = "key#{type}"
+        µ.DOM.on document, event_name, ( event ) => @_call_handlers type, event
+      when 'double'
+        @_detect_doublekey_events null, ( event ) => @_call_handlers type, event
+      else
+        µ.DOM.warn "^4453^ unknown key event type: #{µ.TEXT.rpr type}"
+    return null ### NOTE may return a `remove_listener` method ITF ###
 
