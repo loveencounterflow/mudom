@@ -187,8 +187,9 @@ class @Kb
     # if type? then validate.keywatch_keytype type else type = ''
     validate.keywatch_keyname name
     validate.keywatch_keytype type
-    tag       = "#{type}:#{name}"
-    handlers  = @_registry[ tag ] ?= []
+    behaviors = @_registry[ name ] ?= {}
+    entry     = behaviors[ type  ] ?= {}
+    handlers  = entry.handlers     ?= []
     handlers.push handler
     @_add_listener_for_type type
     #.......................................................................................................
@@ -196,12 +197,12 @@ class @Kb
 
   #---------------------------------------------------------------------------------------------------------
   _call_handlers: ( type, event ) =>
-    name  = event.key
-    d     = freeze { name, type, event, }
-    ### TAINT avoid to iterate over tags like `':'`, `'down:'` if they are known not to be used ###
-    # for tag in [ "#{type}:#{name}", "#{type}:", ":#{event.key}", ":", ]
-    for tag in [ "#{type}:#{event.key}", ]
-      continue unless ( handlers = @_registry[ tag ] )?
+    name      = event.key
+    d         = freeze { name, type, event, }
+    ### TAINT also call catchall handlers ###
+    ### TAINT consider to use method to retrieve handlers ###
+    handlers  = @_registry[ name ]?[ type ]?.handlers ? null
+    if handlers?
       handler d for handler in handlers
     return null
 
