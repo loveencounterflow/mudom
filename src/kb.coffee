@@ -187,9 +187,9 @@ class @Kb
     # if type? then validate.keywatch_keytype type else type = ''
     validate.keywatch_keyname name
     validate.keywatch_keytype type
-    behaviors = @_registry[ name ] ?= {}
-    entry     = behaviors[ type  ] ?= {}
-    handlers  = entry.handlers     ?= []
+    entry     = @_registry[ name ] ?= {}
+    state     = entry.state        ?= {}
+    handlers  = entry[ type  ]     ?= []
     handlers.push handler
     @_add_listener_for_type type
     #.......................................................................................................
