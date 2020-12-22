@@ -151,18 +151,18 @@ class @Kb
 
   #---------------------------------------------------------------------------------------------------------
   # µ_DOM_detect_doublekey_events { event_name: 'µKB_doublekey', dt: 350, }
-  _detect_doublekey_events: ( cfg, handler ) =>
+  _detect_doublekey_events: ( cfg, callback ) =>
     defaults  = { dt: 350, }
     cfg       = { defaults..., cfg..., }
     shreg     = []
     #.......................................................................................................
     get_double_key = ->
-      return false unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < cfg.dt
-      return false unless shreg[ 0 ]?.dir   is 'down'
-      return false unless shreg[ 1 ]?.dir   is 'up'
-      return false unless shreg[ 2 ]?.dir   is 'down'
-      return false unless shreg[ 3 ]?.dir   is 'up'
-      return false unless shreg[ 0 ]?.name  is shreg[ 1 ]?.name is shreg[ 2 ]?.name is shreg[ 3 ]?.name
+      return null unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < cfg.dt
+      return null unless shreg[ 0 ]?.dir   is 'down'
+      return null unless shreg[ 1 ]?.dir   is 'up'
+      return null unless shreg[ 2 ]?.dir   is 'down'
+      return null unless shreg[ 3 ]?.dir   is 'up'
+      return null unless shreg[ 0 ]?.name  is shreg[ 1 ]?.name is shreg[ 2 ]?.name is shreg[ 3 ]?.name
       R             = shreg[ 3 ].name
       shreg.length  = 0
       return R
@@ -172,8 +172,8 @@ class @Kb
       name = event.key
       shreg.push { dir, name, t: Date.now(), }
       shreg.shift() while shreg.length > 4
-      if name = get_double_key()
-        handler event
+      if name == get_double_key()
+        callback event
       return null
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) => push 'down', event
@@ -181,44 +181,50 @@ class @Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _listen_to_key: ( name, type, handler ) =>
+  _listen_to_key: ( name, behavior, handler ) =>
     ### NOTE catch-all bindings to be implemented later ###
-    # if name? then validate.keywatch_keyname name else name = ''
-    # if type? then validate.keywatch_keytype type else type = ''
+    ### NOTE allowing for `'Space'` as alias for `' '` ###
+    name = ' ' if name is 'Space'
     validate.keywatch_keyname name
-    validate.keywatch_keytype type
+    validate.keywatch_keytype behavior
     entry     = @_registry[ name ] ?= {}
     state     = entry.state        ?= {}
-    handlers  = entry[ type  ]     ?= []
+    handlers  = entry[ behavior  ] ?= []
     handlers.push handler
-    @_add_listener_for_type type
+    @_add_listener_for_behavior behavior
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
 
   #---------------------------------------------------------------------------------------------------------
-  _call_handlers: ( type, event ) =>
+  _call_handlers: ( behavior, event ) =>
     name      = event.key
-    d         = freeze { name, type, event, }
+    return null unless ( entry    = @_registry[ name  ] )?
+    return null unless ( handlers = entry[ behavior   ] )?
+    state     = entry.state
+    switch behavior
+      when 'up'     then state.up     = true;   state.down = false
+      when 'down'   then state.up     = false;  state.down = true
+      when 'double' then state.double = not state.double
+    state     = freeze { state..., }
+    d         = freeze { name, behavior, state, event, }
     ### TAINT also call catchall handlers ###
     ### TAINT consider to use method to retrieve handlers ###
-    handlers  = @_registry[ name ]?[ type ]?.handlers ? null
-    if handlers?
-      handler d for handler in handlers
+    handler d for handler in handlers
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _add_listener_for_type: ( type ) ->
-    return null if @_initialized_types[ type ]
-    @_initialized_types[ type ] = true
-    debug '^2252^', "binding type #{type}"
+  _add_listener_for_behavior: ( behavior ) ->
+    return null if @_initialized_types[ behavior ]
+    @_initialized_types[ behavior ] = true
+    debug '^2252^', "binding behavior #{behavior}"
     #.......................................................................................................
-    switch type
+    switch behavior
       when 'up', 'down'
-        event_name = "key#{type}"
-        µ.DOM.on document, event_name, ( event ) => @_call_handlers type, event
+        event_name = "key#{behavior}"
+        µ.DOM.on document, event_name, ( event ) => @_call_handlers behavior, event
       when 'double'
-        @_detect_doublekey_events null, ( event ) => @_call_handlers type, event
+        @_detect_doublekey_events null, ( event ) => @_call_handlers behavior, event
       else
-        µ.DOM.warn "^4453^ unknown key event type: #{µ.TEXT.rpr type}"
+        µ.DOM.warn "^4453^ unknown key event behavior: #{µ.TEXT.rpr behavior}"
     return null ### NOTE may return a `remove_listener` method ITF ###
 
