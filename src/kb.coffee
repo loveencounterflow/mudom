@@ -152,33 +152,37 @@ class @Kb
   #---------------------------------------------------------------------------------------------------------
   _registry:          {}
   _initialized_types: {}
+  _shreg:             []
 
   #---------------------------------------------------------------------------------------------------------
-  _detect_latch_events: ( callback ) =>
-    shreg     = []
-    #.......................................................................................................
-    get_double_key = ->
-      return null unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < @cfg.latch.dt
-      return null unless shreg[ 0 ]?.dir   is 'down'
-      return null unless shreg[ 1 ]?.dir   is 'up'
-      return null unless shreg[ 2 ]?.dir   is 'down'
-      return null unless shreg[ 3 ]?.dir   is 'up'
-      return null unless shreg[ 0 ]?.name  is shreg[ 1 ]?.name is shreg[ 2 ]?.name is shreg[ 3 ]?.name
-      R             = shreg[ 3 ].name
-      shreg.length  = 0
-      return R
-    #.......................................................................................................
-    shift = -> shreg.shift()
-    push = ( dir, event ) ->
+  _get_double_key: ->
+    return null unless ( Date.now() - ( @_shreg[ 0 ]?.t ? 0 ) ) < @cfg.latch.dt
+    return null unless @_shreg[ 0 ]?.dir   is 'down'
+    return null unless @_shreg[ 1 ]?.dir   is 'up'
+    return null unless @_shreg[ 2 ]?.dir   is 'down'
+    return null unless @_shreg[ 3 ]?.dir   is 'up'
+    return null unless @_shreg[ 0 ]?.name  is @_shreg[ 1 ]?.name is @_shreg[ 2 ]?.name is @_shreg[ 3 ]?.name
+    R               = @_shreg[ 3 ].name
+    @_shreg.length  = 0
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
+  _detect_latch_events: ( callback ) ->
+    shift   = -> @_shreg.shift()
+    push    = ( dir, event ) =>
       name = event.key
-      shreg.push { dir, name, t: Date.now(), }
-      shreg.shift() while shreg.length > 4
-      if name == get_double_key()
+      @_shreg.push { dir, name, t: Date.now(), }
+      @_shreg.shift() while @_shreg.length > 4
+      if name == @_get_double_key @_shreg
         callback event
       return null
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) => push 'down', event
     µ.DOM.on document, 'keyup',   ( event ) => push 'up',   event
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _detect_tlatch_events: ( callback ) =>
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -226,14 +230,15 @@ class @Kb
   _add_listener_for_behavior: ( behavior ) ->
     return null if @_initialized_types[ behavior ]
     @_initialized_types[ behavior ] = true
-    debug '^2252^', "binding behavior #{behavior}"
     #.......................................................................................................
     switch behavior
       when 'up', 'down'
         event_name = "key#{behavior}"
         µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
       when 'latch'
-        @_detect_latch_events null, ( event ) => @_call_handlers behavior, event
+        @_detect_latch_events           ( event ) => @_call_handlers behavior, event
+      when 'tlatch'
+        @_detect_tlatch_events          ( event ) => @_call_handlers behavior, event
       when 'toggle'
         µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
         µ.DOM.on document, 'keydown',   ( event ) => @_call_handlers behavior, event

@@ -12,7 +12,7 @@ Object.assign @, @types.export()
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'keywatch_keytype', tests:
-  "x is one of 'toggle', 'latch', 'up', 'down": ( x ) -> x in [ 'toggle', 'latch', 'up', 'down', ]
+  "x is one of 'toggle', 'latch', 'tlatch', 'up', 'down": ( x ) -> x in [ 'toggle', 'latch', 'tlatch', 'up', 'down', ]
 
 # #-----------------------------------------------------------------------------------------------------------
 # @declare 'keywatch_keynames', tests:
