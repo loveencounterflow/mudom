@@ -17,6 +17,10 @@ freeze                    = Object.freeze
 defaults                  =
 
   #---------------------------------------------------------------------------------------------------------
+  latch:
+    dt:     350 # time in milliseconds between first and last key event to trigger latching
+
+  #---------------------------------------------------------------------------------------------------------
   kblike_eventnames: [
     # ### TAINT not all of these events are needed
     'click',
@@ -150,14 +154,11 @@ class @Kb
   _initialized_types: {}
 
   #---------------------------------------------------------------------------------------------------------
-  # µ_DOM_detect_doublekey_events { event_name: 'µKB_doublekey', dt: 350, }
-  _detect_doublekey_events: ( cfg, callback ) =>
-    defaults  = { dt: 350, }
-    cfg       = { defaults..., cfg..., }
+  _detect_latch_events: ( callback ) =>
     shreg     = []
     #.......................................................................................................
     get_double_key = ->
-      return null unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < cfg.dt
+      return null unless ( Date.now() - ( shreg[ 0 ]?.t ? 0 ) ) < @cfg.latch.dt
       return null unless shreg[ 0 ]?.dir   is 'down'
       return null unless shreg[ 1 ]?.dir   is 'up'
       return null unless shreg[ 2 ]?.dir   is 'down'
@@ -204,10 +205,9 @@ class @Kb
     switch behavior
       when 'up'     then state.up     = true;   state.down = false
       when 'down'   then state.up     = false;  state.down = true
-      when 'latch' then state.latch = not state.latch
+      when 'latch'  then state.latch  = not state.latch
       when 'toggle'
         toggle  = ( state.toggle ?= false )
-        # log '^298^', xxx_count, { toggle, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
         if ( event.type is 'keydown' ) and ( toggle is false )
           state.toggle      = true
           entry.skip_next_keyup   = true
@@ -233,7 +233,7 @@ class @Kb
         event_name = "key#{behavior}"
         µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
       when 'latch'
-        @_detect_doublekey_events null, ( event ) => @_call_handlers behavior, event
+        @_detect_latch_events null, ( event ) => @_call_handlers behavior, event
       when 'toggle'
         µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
         µ.DOM.on document, 'keydown',   ( event ) => @_call_handlers behavior, event
