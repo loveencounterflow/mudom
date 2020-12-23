@@ -182,21 +182,25 @@ class @Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _detect_tlatch_events: ( callback ) =>
+  _detect_tlatch_events: ( name, callback ) =>
+    entry     = @_registry[ name ] ?= {}
+    state     = entry.state        ?= {}
+    µ.DOM.on document, 'keydown', ( event ) => state.tlatch = not state.latch
+    µ.DOM.on document, 'keyup',   ( event ) => state.tlatch =     state.latch
     return null
 
   #---------------------------------------------------------------------------------------------------------
   _listen_to_key: ( name, behavior, handler ) =>
     ### NOTE catch-all bindings to be implemented later ###
     ### NOTE allowing for `'Space'` as alias for `' '` ###
-    name = ' ' if name is 'Space'
+    name      = ' ' if name is 'Space'
     validate.keywatch_keyname name
     validate.keywatch_keytype behavior
     entry     = @_registry[ name ] ?= {}
     state     = entry.state        ?= {}
     handlers  = entry[ behavior  ] ?= []
     handlers.push handler
-    @_add_listener_for_behavior behavior
+    @_add_listener_for_behavior behavior, name
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
 
@@ -227,7 +231,7 @@ class @Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _add_listener_for_behavior: ( behavior ) ->
+  _add_listener_for_behavior: ( behavior, keyname ) ->
     return null if @_initialized_types[ behavior ]
     @_initialized_types[ behavior ] = true
     #.......................................................................................................
@@ -238,7 +242,7 @@ class @Kb
       when 'latch'
         @_detect_latch_events           ( event ) => @_call_handlers behavior, event
       when 'tlatch'
-        @_detect_tlatch_events          ( event ) => @_call_handlers behavior, event
+        @_detect_tlatch_events keyname, ( event ) => @_call_handlers behavior, event
       when 'toggle'
         µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
         µ.DOM.on document, 'keydown',   ( event ) => @_call_handlers behavior, event
