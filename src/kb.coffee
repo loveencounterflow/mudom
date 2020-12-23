@@ -198,10 +198,8 @@ class @Kb
   #---------------------------------------------------------------------------------------------------------
   _call_handlers: ( behavior, event ) =>
     name      = event.key
-    entry     = @_registry[ name  ]
-    return null unless entry?
-    handlers  = entry[ behavior   ]
-    return null unless handlers?
+    entry     = @_registry[ name  ]; return null unless entry?
+    handlers  = entry[ behavior   ]; return null unless handlers?
     state     = entry.state
     switch behavior
       when 'up'     then state.up     = true;   state.down = false
@@ -209,15 +207,13 @@ class @Kb
       when 'dlatch' then state.dlatch = not state.dlatch
       when 'slatch'
         slatch  = ( state.slatch ?= false )
-        log '^298^', { slatch, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
+        # log '^298^', xxx_count, { slatch, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
         if ( event.type is 'keydown' ) and ( slatch is false )
           state.slatch      = true
           entry.skip_next_keyup   = true
         else if ( event.type is 'keyup' ) and ( slatch is true )
-          if entry.skip_next_keyup
-            entry.skip_next_keyup = false
-          else
-            state.slatch      = false
+          if entry.skip_next_keyup then entry.skip_next_keyup = false
+          else                          state.slatch          = false
     #.......................................................................................................
     state     = freeze { state..., }
     d         = freeze { name, behavior, state, event, }
