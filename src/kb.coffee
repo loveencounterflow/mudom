@@ -198,13 +198,27 @@ class @Kb
   #---------------------------------------------------------------------------------------------------------
   _call_handlers: ( behavior, event ) =>
     name      = event.key
-    return null unless ( entry    = @_registry[ name  ] )?
-    return null unless ( handlers = entry[ behavior   ] )?
+    entry     = @_registry[ name  ]
+    return null unless entry?
+    handlers  = entry[ behavior   ]
+    return null unless handlers?
     state     = entry.state
     switch behavior
       when 'up'     then state.up     = true;   state.down = false
       when 'down'   then state.up     = false;  state.down = true
-      when 'double' then state.double = not state.double
+      when 'dlatch' then state.dlatch = not state.dlatch
+      when 'slatch'
+        slatch  = ( state.slatch ?= false )
+        log '^298^', { slatch, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
+        if ( event.type is 'keydown' ) and ( slatch is false )
+          state.slatch      = true
+          entry.skip_next_keyup   = true
+        else if ( event.type is 'keyup' ) and ( slatch is true )
+          if entry.skip_next_keyup
+            entry.skip_next_keyup = false
+          else
+            state.slatch      = false
+    #.......................................................................................................
     state     = freeze { state..., }
     d         = freeze { name, behavior, state, event, }
     ### TAINT also call catchall handlers ###
@@ -221,9 +235,12 @@ class @Kb
     switch behavior
       when 'up', 'down'
         event_name = "key#{behavior}"
-        µ.DOM.on document, event_name, ( event ) => @_call_handlers behavior, event
-      when 'double'
+        µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
+      when 'dlatch'
         @_detect_doublekey_events null, ( event ) => @_call_handlers behavior, event
+      when 'slatch'
+        µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
+        µ.DOM.on document, 'keydown',   ( event ) => @_call_handlers behavior, event
       else
         µ.DOM.warn "^4453^ unknown key event behavior: #{µ.TEXT.rpr behavior}"
     return null ### NOTE may return a `remove_listener` method ITF ###
