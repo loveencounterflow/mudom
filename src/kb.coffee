@@ -205,15 +205,15 @@ class @Kb
       when 'up'     then state.up     = true;   state.down = false
       when 'down'   then state.up     = false;  state.down = true
       when 'dlatch' then state.dlatch = not state.dlatch
-      when 'slatch'
-        slatch  = ( state.slatch ?= false )
-        # log '^298^', xxx_count, { slatch, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
-        if ( event.type is 'keydown' ) and ( slatch is false )
-          state.slatch      = true
+      when 'toggle'
+        toggle  = ( state.toggle ?= false )
+        # log '^298^', xxx_count, { toggle, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
+        if ( event.type is 'keydown' ) and ( toggle is false )
+          state.toggle      = true
           entry.skip_next_keyup   = true
-        else if ( event.type is 'keyup' ) and ( slatch is true )
+        else if ( event.type is 'keyup' ) and ( toggle is true )
           if entry.skip_next_keyup then entry.skip_next_keyup = false
-          else                          state.slatch          = false
+          else                          state.toggle          = false
     #.......................................................................................................
     state     = freeze { state..., }
     d         = freeze { name, behavior, state, event, }
@@ -234,7 +234,7 @@ class @Kb
         µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
       when 'dlatch'
         @_detect_doublekey_events null, ( event ) => @_call_handlers behavior, event
-      when 'slatch'
+      when 'toggle'
         µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
         µ.DOM.on document, 'keydown',   ( event ) => @_call_handlers behavior, event
       else
