@@ -204,7 +204,7 @@ class @Kb
     switch behavior
       when 'up'     then state.up     = true;   state.down = false
       when 'down'   then state.up     = false;  state.down = true
-      when 'dlatch' then state.dlatch = not state.dlatch
+      when 'latch' then state.latch = not state.latch
       when 'toggle'
         toggle  = ( state.toggle ?= false )
         # log '^298^', xxx_count, { toggle, type: event.type, skip_next_keyup: entry.skip_next_keyup, }
@@ -232,7 +232,7 @@ class @Kb
       when 'up', 'down'
         event_name = "key#{behavior}"
         µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
-      when 'dlatch'
+      when 'latch'
         @_detect_doublekey_events null, ( event ) => @_call_handlers behavior, event
       when 'toggle'
         µ.DOM.on document, 'keyup',     ( event ) => @_call_handlers behavior, event
