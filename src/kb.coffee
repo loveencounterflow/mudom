@@ -183,10 +183,17 @@ class @Kb
 
   #---------------------------------------------------------------------------------------------------------
   _detect_tlatch_events: ( name, callback ) =>
+    debug '^339^', name
     entry     = @_registry[ name ] ?= {}
     state     = entry.state        ?= {}
-    µ.DOM.on document, 'keydown', ( event ) => state.tlatch = not state.latch
-    µ.DOM.on document, 'keyup',   ( event ) => state.tlatch =     state.latch
+    µ.DOM.on document, 'keydown', ( event ) =>
+      state.tlatch = not state.latch
+      debug '^4455-keydown^', name, state
+      callback event
+    µ.DOM.on document, 'keyup',   ( event ) =>
+      state.tlatch =     state.latch
+      debug '^4455-keyup^', name, state
+      callback event
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -200,6 +207,7 @@ class @Kb
     state     = entry.state        ?= {}
     handlers  = entry[ behavior  ] ?= []
     handlers.push handler
+    debug '^_listen_to_key@1112^', { name, behavior, }
     @_add_listener_for_behavior behavior, name
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
