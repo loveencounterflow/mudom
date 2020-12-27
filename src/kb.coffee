@@ -172,7 +172,7 @@ class @Kb extends @_Kb
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  _initialized_latching: ->
+  _initialize_latching: ->
     return null if @_latching_initialized
     @_latching_initialized = true
     push = ( dir, event ) =>
