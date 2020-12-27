@@ -63,7 +63,7 @@ defaults                  =
 #-----------------------------------------------------------------------------------------------------------
 #
 #===========================================================================================================
-class @Kb
+class @_Kb
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
@@ -124,8 +124,8 @@ class @Kb
       @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     #.......................................................................................................
-    for event_name in @cfg.kblike_eventnames
-      µ.DOM.on document, event_name, handle_kblike_event
+    for eventname in @cfg.kblike_eventnames
+      µ.DOM.on document, eventname, handle_kblike_event
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) =>
       handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
@@ -152,34 +152,19 @@ class @Kb
   #---------------------------------------------------------------------------------------------------------
   _registry:          {}
   _initialized_types: {}
-  _shreg:             []
 
   #---------------------------------------------------------------------------------------------------------
-  _get_double_key: ->
-    return null unless ( Date.now() - ( @_shreg[ 0 ]?.t ? 0 ) ) < @cfg.latch.dt
-    return null unless @_shreg[ 0 ]?.dir   is 'down'
-    return null unless @_shreg[ 1 ]?.dir   is 'up'
-    return null unless @_shreg[ 2 ]?.dir   is 'down'
-    return null unless @_shreg[ 3 ]?.dir   is 'up'
-    return null unless @_shreg[ 0 ]?.name  is @_shreg[ 1 ]?.name is @_shreg[ 2 ]?.name is @_shreg[ 3 ]?.name
-    R               = @_shreg[ 3 ].name
-    @_shreg.length  = 0
-    return R
-
-  #---------------------------------------------------------------------------------------------------------
-  _detect_latch_events: ( callback ) ->
-    shift   = -> @_shreg.shift()
-    push    = ( dir, event ) =>
-      name = event.key
-      @_shreg.push { dir, name, t: Date.now(), }
-      @_shreg.shift() while @_shreg.length > 4
-      if name == @_get_double_key @_shreg
-        callback event
-      return null
-    #.......................................................................................................
-    µ.DOM.on document, 'keydown', ( event ) => push 'down', event
-    µ.DOM.on document, 'keyup',   ( event ) => push 'up',   event
-    return null
+  _add_dom_kb_event_listener: ( keyname, eventname, callback ) ->
+    ### Given a `keyname`, an `eventname` (such as `'keydown'` or `'keyup'`) and a `callback`, add an event
+    listener such that `callback` will be called with an `event` as argument whenever a DOM event for that
+    specific key and event name is triggered. ###
+    validate.keywatch_keyname name
+    validate.nonempty_text eventname
+    validate.function callback
+    µ.DOM.on document, eventname, ( event ) =>
+      callback event if event.key is keyname
+      return true
+    return null ### TAINT may return listener reference ITF ###
 
   #---------------------------------------------------------------------------------------------------------
   _detect_tlatch_events: ( name, callback ) =>
@@ -195,22 +180,6 @@ class @Kb
       debug '^4455-keyup^', name, state
       callback event
     return null
-
-  #---------------------------------------------------------------------------------------------------------
-  _listen_to_key: ( name, behavior, handler ) =>
-    ### NOTE catch-all bindings to be implemented later ###
-    ### NOTE allowing for `'Space'` as alias for `' '` ###
-    name      = ' ' if name is 'Space'
-    validate.keywatch_keyname name
-    validate.keywatch_keytype behavior
-    entry     = @_registry[ name ] ?= {}
-    state     = entry.state        ?= {}
-    handlers  = entry[ behavior  ] ?= []
-    handlers.push handler
-    debug '^_listen_to_key@1112^', { name, behavior, }
-    @_add_listener_for_behavior behavior, name
-    #.......................................................................................................
-    return null ### NOTE may return a `remove_listener` method ITF ###
 
   #---------------------------------------------------------------------------------------------------------
   _call_handlers: ( behavior, event ) =>
@@ -245,8 +214,8 @@ class @Kb
     #.......................................................................................................
     switch behavior
       when 'up', 'down'
-        event_name = "key#{behavior}"
-        µ.DOM.on document, event_name,  ( event ) => @_call_handlers behavior, event
+        eventname = "key#{behavior}"
+        µ.DOM.on document, eventname,  ( event ) => @_call_handlers behavior, event
       when 'latch'
         @_detect_latch_events           ( event ) => @_call_handlers behavior, event
       when 'tlatch'
@@ -257,4 +226,111 @@ class @Kb
       else
         µ.DOM.warn "^4453^ unknown key event behavior: #{µ.TEXT.rpr behavior}"
     return null ### NOTE may return a `remove_listener` method ITF ###
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key: ( name, behavior, handler ) =>
+    ### NOTE catch-all bindings to be implemented later ###
+    ### NOTE allowing for `'Space'` as alias for `' '` ###
+    name      = ' ' if name is 'Space'
+    validate.keywatch_keyname name
+    validate.keywatch_keytype behavior
+    entry     = @_registry[ name ] ?= {}
+    state     = entry.state        ?= {}
+    handlers  = entry[ behavior  ] ?= []
+    handlers.push handler
+    debug '^_listen_to_key@1112^', { name, behavior, }
+    @_add_listener_for_behavior behavior, name
+    #.......................................................................................................
+    return null ### NOTE may return a `remove_listener` method ITF ###
+
+class @Kb extends @_Kb
+
+  # #---------------------------------------------------------------------------------------------------------
+  # _defaults: freeze {
+  #   state: freeze { down: false, up: false, toggle: false, latch: false, tlatch: false, }
+  #   }
+
+  #---------------------------------------------------------------------------------------------------------
+  _shreg:                 []
+  _latching_initialized:  false
+
+  #---------------------------------------------------------------------------------------------------------
+  _get_latching_keyname: ->
+    return null unless ( Date.now() - ( @_shreg[ 0 ]?.t ? 0 ) ) < @cfg.latch.dt
+    return null unless @_shreg[ 0 ]?.dir   is 'down'
+    return null unless @_shreg[ 1 ]?.dir   is 'up'
+    return null unless @_shreg[ 2 ]?.dir   is 'down'
+    return null unless @_shreg[ 3 ]?.dir   is 'up'
+    return null unless @_shreg[ 0 ]?.name  is @_shreg[ 1 ]?.name is @_shreg[ 2 ]?.name is @_shreg[ 3 ]?.name
+    R               = @_shreg[ 3 ].name
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
+  _initialized_latching: ->
+    return null if @_latching_initialized
+    @_latching_initialized = true
+    push = ( dir, event ) =>
+      name = event.key
+      @_shreg.push { dir, name, t: Date.now(), }
+      @_shreg.shift() while @_shreg.length > 4
+      return true
+    µ.DOM.on document, 'keydown', ( event ) => push 'down', event
+    µ.DOM.on document, 'keyup',   ( event ) => push 'up',   event
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key: ( keyname, behavior, handler ) =>
+    keyname = ' ' if keyname is 'Space'
+    validate.keywatch_keyname keyname
+    validate.keywatch_keytype behavior
+    entry   = { state: false, }
+    # entry   = @_registry[ keyname ]  ?= {}
+    # state   = entry.state            ?= { @_defaults.state..., }
+    #.......................................................................................................
+    do ( entry ) =>
+      # debug '^@Kb2._listen_to_key@30^', { keyname, behavior, }
+      switch behavior
+        #...................................................................................................
+        when 'push'
+          µ.DOM.on document, 'keydown', ( event ) =>
+            return true unless event.key is keyname
+            entry.state = true
+            handler freeze { keyname, behavior, state: entry.state, event, }
+            return true
+          µ.DOM.on document, 'keyup', ( event ) =>
+            return true unless event.key is keyname
+            entry.state = false
+            handler freeze { keyname, behavior, state: entry.state, event, }
+            return true
+        #...................................................................................................
+        when 'toggle'
+          µ.DOM.on document, 'keydown', ( event ) =>
+            return true unless event.key is keyname
+            return true if entry.state
+            entry.state           = true
+            entry.skip_next_keyup = true
+            # debug '^_listen_to_key@223^', 'keydown', { keyname, behavior, entry, }
+            handler freeze { keyname, behavior, state: entry.state, event, }
+            return true
+          µ.DOM.on document, 'keyup', ( event ) =>
+            return true unless event.key is keyname
+            return true if not entry.state
+            if entry.skip_next_keyup then entry.skip_next_keyup = false
+            else                          entry.state           = false
+            # debug '^_listen_to_key@223^', 'toggle/keyup', { keyname, behavior, entry, }
+            handler freeze { keyname, behavior, state: entry.state, event, }
+            return true
+        #...................................................................................................
+        when 'latch'
+          @_initialized_latching()
+          µ.DOM.on document, 'keyup', ( event ) =>
+            if keyname is @_get_latching_keyname()
+              entry.state = not entry.state
+              handler freeze { keyname, behavior, state: entry.state, event, }
+            return true
+        #...................................................................................................
+      return null
+    #.......................................................................................................
+    return null ### NOTE may return a `remove_listener` method ITF ###
+
 
