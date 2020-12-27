@@ -252,7 +252,6 @@ class @Kb extends @_Kb
     is_latched  = false
     #.......................................................................................................
     @_listen_to_key keyname, 'latch', ( d ) =>
-      debug '^_listen_to_key_tlatch', d
       is_latched = d.state
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) =>
@@ -270,16 +269,68 @@ class @Kb extends @_Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_ptlatch: ( keyname, handler ) ->
+    state       = false
+    behavior    = 'ptlatch'
+    is_latched  = false
+    #.......................................................................................................
+    @_listen_to_key keyname, 'latch', ( d ) =>
+      is_latched = d.state
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      return true unless event.key is keyname
+      return true if is_latched
+      state = true
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup',   ( event ) =>
+      return true unless event.key is keyname
+      return true if is_latched
+      state = false
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_ntlatch: ( keyname, handler ) ->
+    state       = false
+    behavior    = 'ntlatch'
+    is_latched  = false
+    #.......................................................................................................
+    @_listen_to_key keyname, 'latch', ( d ) =>
+      is_latched = d.state
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      return true unless event.key is keyname
+      return true unless is_latched
+      state = false
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup',   ( event ) =>
+      return true unless event.key is keyname
+      return true unless is_latched
+      state = true
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
   _listen_to_key: ( keyname, behavior, handler ) =>
     keyname = ' ' if keyname is 'Space'
     validate.keywatch_keyname keyname
     validate.keywatch_keytype behavior
     #.......................................................................................................
     switch behavior
-      when 'push'     then @_listen_to_key_push   keyname, handler
-      when 'toggle'   then @_listen_to_key_toggle keyname, handler
-      when 'latch'    then @_listen_to_key_latch  keyname, handler
-      when 'tlatch'   then @_listen_to_key_tlatch keyname, handler
+      when 'push'     then @_listen_to_key_push     keyname, handler
+      when 'toggle'   then @_listen_to_key_toggle   keyname, handler
+      when 'latch'    then @_listen_to_key_latch    keyname, handler
+      when 'tlatch'   then @_listen_to_key_tlatch   keyname, handler
+      when 'ntlatch'  then @_listen_to_key_ntlatch  keyname, handler
+      when 'ptlatch'  then @_listen_to_key_ptlatch  keyname, handler
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
 
