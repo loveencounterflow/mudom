@@ -184,58 +184,102 @@ class @Kb extends @_Kb
     µ.DOM.on document, 'keyup',   ( event ) => push 'up',   event
     return null
 
+  #=========================================================================================================
+  #
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_push: ( keyname, handler ) ->
+    state     = false
+    behavior  = 'push'
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      return true unless event.key is keyname
+      state = true
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup', ( event ) =>
+      return true unless event.key is keyname
+      state = false
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_toggle: ( keyname, handler ) ->
+    state     = false
+    behavior  = 'toggle'
+    skip_next = false
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      return true unless event.key is keyname
+      return true if state
+      state           = true
+      skip_next = true
+      # debug '^_listen_to_key@223^', 'keydown', { keyname, behavior, entry, }
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup', ( event ) =>
+      return true unless event.key is keyname
+      return true if not state
+      if skip_next then skip_next = false
+      else              state     = false
+      # debug '^_listen_to_key@223^', 'toggle/keyup', { keyname, behavior, entry, }
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_latch: ( keyname, handler ) ->
+    @_initialize_latching()
+    state     = false
+    behavior  = 'latch'
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup', ( event ) =>
+      if keyname is @_get_latching_keyname()
+        state = not state
+        handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key_tlatch: ( keyname, handler ) ->
+    state       = false
+    behavior    = 'tlatch'
+    is_latched  = false
+    #.......................................................................................................
+    @_listen_to_key keyname, 'latch', ( d ) =>
+      debug '^_listen_to_key_tlatch', d
+      is_latched = d.state
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      return true unless event.key is keyname
+      state = not is_latched
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup',   ( event ) =>
+      return true unless event.key is keyname
+      state = is_latched
+      handler freeze { keyname, behavior, state, event, }
+      return true
+    #.......................................................................................................
+    return null
+
   #---------------------------------------------------------------------------------------------------------
   _listen_to_key: ( keyname, behavior, handler ) =>
     keyname = ' ' if keyname is 'Space'
     validate.keywatch_keyname keyname
     validate.keywatch_keytype behavior
-    entry   = { state: false, }
-    # entry   = @_registry[ keyname ]  ?= {}
-    # state   = entry.state            ?= { @_defaults.state..., }
     #.......................................................................................................
-    do ( entry ) =>
-      # debug '^@Kb2._listen_to_key@30^', { keyname, behavior, }
-      switch behavior
-        #...................................................................................................
-        when 'push'
-          µ.DOM.on document, 'keydown', ( event ) =>
-            return true unless event.key is keyname
-            entry.state = true
-            handler freeze { keyname, behavior, state: entry.state, event, }
-            return true
-          µ.DOM.on document, 'keyup', ( event ) =>
-            return true unless event.key is keyname
-            entry.state = false
-            handler freeze { keyname, behavior, state: entry.state, event, }
-            return true
-        #...................................................................................................
-        when 'toggle'
-          µ.DOM.on document, 'keydown', ( event ) =>
-            return true unless event.key is keyname
-            return true if entry.state
-            entry.state           = true
-            entry.skip_next_keyup = true
-            # debug '^_listen_to_key@223^', 'keydown', { keyname, behavior, entry, }
-            handler freeze { keyname, behavior, state: entry.state, event, }
-            return true
-          µ.DOM.on document, 'keyup', ( event ) =>
-            return true unless event.key is keyname
-            return true if not entry.state
-            if entry.skip_next_keyup then entry.skip_next_keyup = false
-            else                          entry.state           = false
-            # debug '^_listen_to_key@223^', 'toggle/keyup', { keyname, behavior, entry, }
-            handler freeze { keyname, behavior, state: entry.state, event, }
-            return true
-        #...................................................................................................
-        when 'latch'
-          @_initialized_latching()
-          µ.DOM.on document, 'keyup', ( event ) =>
-            if keyname is @_get_latching_keyname()
-              entry.state = not entry.state
-              handler freeze { keyname, behavior, state: entry.state, event, }
-            return true
-        #...................................................................................................
-      return null
+    switch behavior
+      when 'push'     then @_listen_to_key_push   keyname, handler
+      when 'toggle'   then @_listen_to_key_toggle keyname, handler
+      when 'latch'    then @_listen_to_key_latch  keyname, handler
+      when 'tlatch'   then @_listen_to_key_tlatch keyname, handler
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
 
