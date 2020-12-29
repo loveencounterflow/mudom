@@ -14,35 +14,35 @@
   - [DOM](#dom)
   - [TEXT](#text)
   - [KB](#kb)
-- [How to use it](#how-to-use-it)
-- [To do](#to-do)
+- [How to Use It](#how-to-use-it)
+- [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
-# What it Is
+## What it Is
 
 utilities to handle DOM-related tasks
 
-# Installation
+## Installation
 
 ```bash
 npm install mudom
 ```
 
-# API
+## API
 
-## DOM
-## TEXT
-## KB
+### DOM
+### TEXT
+### KB
 
 Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 
-# How to use it
+## How to Use It
 
 * runs in the browser using [`browserify`](https://github.com/browserify/browserify)
 
-# To do
+## To Do
 
 * [ ] absorb `µ.keyboard-modifier-emitter.js` (svelte app2)
 * [ ] absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
