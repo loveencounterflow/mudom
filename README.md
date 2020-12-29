@@ -10,6 +10,10 @@
 
 - [What it Is](#what-it-is)
 - [Installation](#installation)
+- [API](#api)
+  - [DOM](#dom)
+  - [TEXT](#text)
+  - [KB](#kb)
 - [To do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -25,9 +29,17 @@ utilities to handle DOM-related tasks
 npm install mudom
 ```
 
+# API
+
+## DOM
+## TEXT
+## KB
+
+Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
+
 
 # To do
 
 * [ ] absorb `µ.keyboard-modifier-emitter.js` (svelte app2)
 * [ ] absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
-
+* [ ] documentation
