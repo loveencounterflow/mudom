@@ -25,6 +25,10 @@ Object.assign @, @types.export()
   "x is a nonempty_text":      ( x ) -> @isa.nonempty_text x
 
 #-----------------------------------------------------------------------------------------------------------
+@declare 'kb_watcher', tests:
+  "x is a function or a nonempty_text":   ( x ) -> ( @isa.function x )or ( @isa.nonempty_text x )
+
+#-----------------------------------------------------------------------------------------------------------
 ### TAINT probably not correct to only check for Element, at least in some cases could be Node as well ###
 @declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )
 @declare 'element',        ( x ) -> x instanceof Element

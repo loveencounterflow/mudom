@@ -319,7 +319,10 @@ class @Kb extends @_Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _listen_to_key: ( keyname, behavior, handler ) =>
+  _listen_to_key: ( keyname, behavior, watcher ) =>
+    validate.kb_watcher watcher
+    if isa.function watcher then  handler = watcher
+    else                          handler = ( d ) -> µ.DOM.emit_custom_event watcher, { detail: d, }
     keyname = ' ' if keyname is 'Space'
     validate.kb_keyname keyname
     validate.kb_keytype behavior
