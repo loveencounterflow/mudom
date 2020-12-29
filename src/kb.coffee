@@ -119,36 +119,6 @@ class @_Kb
     # validate.kb_keynames  keynames
     # validate.kb_types     types
 
-  #---------------------------------------------------------------------------------------------------------
-  _listen_to_modifiers: ( watcher ) =>
-    ### NOTE could use null watcher to auto-correct modifier states for `_listen_to_key()` ###
-    handler = @_handler_from_watcher watcher
-    #.......................................................................................................
-    handle_kblike_event = ( event ) =>
-      modifier_state = @get_changed_kb_modifier_state event
-      if ( modifier_state != null )
-        watcher modifier_state
-      @_set_capslock_state event.getModifierState 'CapsLock'
-      return null
-    #.......................................................................................................
-    for eventname in @cfg.kblike_eventnames
-      µ.DOM.on document, eventname, handle_kblike_event
-    #.......................................................................................................
-    µ.DOM.on document, 'keydown', ( event ) =>
-      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
-      ### TAINT logic is questionable ###
-      if ( event.key is 'CapsLock' ) then @_set_capslock_state not @_capslock_active
-      else                                @_set_capslock_state event.getModifierState 'CapsLock'
-      return null
-    #.......................................................................................................
-    µ.DOM.on document, 'keyup', ( event ) =>
-      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
-      ### TAINT logic is questionable ###
-      return null if event.key is 'CapsLock'
-      @_set_capslock_state event.getModifierState 'CapsLock'
-      return null
-    return null
-
   ##########################################################################################################
   ##########################################################################################################
   ##########################################################################################################
@@ -349,4 +319,46 @@ class @Kb extends @_Kb
     #.......................................................................................................
     return null ### NOTE may return a `remove_listener` method ITF ###
 
+  #=========================================================================================================
+  # MBMCD
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_modifiers: ( watcher = null ) =>
+    if watcher? then  handler = @_handler_from_watcher watcher
+    else              handler = @_emit_mbmcd_key_events
+    #.......................................................................................................
+    handle_kblike_event = ( event ) =>
+      modifier_state = @get_changed_kb_modifier_state event
+      if ( modifier_state != null )
+        handler modifier_state
+      @_set_capslock_state event.getModifierState 'CapsLock'
+      return null
+    #.......................................................................................................
+    for eventname in @cfg.kblike_eventnames
+      µ.DOM.on document, eventname, handle_kblike_event
+    #.......................................................................................................
+    µ.DOM.on document, 'keydown', ( event ) =>
+      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
+      ### TAINT logic is questionable ###
+      if ( event.key is 'CapsLock' ) then @_set_capslock_state not @_capslock_active
+      else                                @_set_capslock_state event.getModifierState 'CapsLock'
+      return null
+    #.......................................................................................................
+    µ.DOM.on document, 'keyup', ( event ) =>
+      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
+      ### TAINT logic is questionable ###
+      return null if event.key is 'CapsLock'
+      @_set_capslock_state event.getModifierState 'CapsLock'
+      return null
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _emit_mbmcd_key_events: ( d ) =>
+    ### Accepts an object with modifier names as keys, booleans as values; will emit `keydown`, `keyup`
+    events as needed. ###
+    ### TAINT only iterate over modifier names? ###
+    for key, state of d
+      continue if key is '_type'
+      eventname = if state then 'keydown' else 'keyup'
+      document.dispatchEvent new KeyboardEvent eventname, { key, }
+    return null
 
