@@ -85,12 +85,17 @@ class @_Kb
     ### Return keyboard modifier state if it has changed since the last call, or `null` if it hasn't changed. ###
     # log( '^33988^', { event, } )
     crt_modifiers     = { _type: event.type, }
-    has_changed       = false
+    changed_modifiers = { _type: event.type, }
+    any_has_changed   = false
     for modifier_name in @cfg.modifier_names
-      state                           = event.getModifierState modifier_name
-      has_changed                     = has_changed or ( @_prv_modifiers[ modifier_name ] isnt state )
-      crt_modifiers[ modifier_name ]  = state
-    return @_prv_modifiers = freeze crt_modifiers if has_changed
+      state                               = event.getModifierState modifier_name
+      this_has_changed                    = ( @_prv_modifiers[ modifier_name ] isnt state )
+      any_has_changed                     = any_has_changed or this_has_changed
+      crt_modifiers[ modifier_name ]      = state
+      changed_modifiers[ modifier_name ]  = state if this_has_changed
+    if any_has_changed
+      @_prv_modifiers = freeze crt_modifiers
+      return changed_modifiers
     return null
 
 #-----------------------------------------------------------------------------------------------------------
@@ -115,12 +120,14 @@ class @_Kb
     # validate.kb_types     types
 
   #---------------------------------------------------------------------------------------------------------
-  XXXXXXXXXXXX_foobar: =>
+  _listen_to_modifiers: ( watcher ) =>
+    ### NOTE could use null watcher to auto-correct modifier states for `_listen_to_key()` ###
+    handler = @_handler_from_watcher watcher
     #.......................................................................................................
     handle_kblike_event = ( event ) =>
       modifier_state = @get_changed_kb_modifier_state event
       if ( modifier_state != null )
-        µ.DOM.emit_custom_event 'µ_kb_modifier_changed', { detail: modifier_state, }
+        watcher modifier_state
       @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     #.......................................................................................................
@@ -128,14 +135,14 @@ class @_Kb
       µ.DOM.on document, eventname, handle_kblike_event
     #.......................................................................................................
     µ.DOM.on document, 'keydown', ( event ) =>
-      handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
+      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
       ### TAINT logic is questionable ###
       if ( event.key is 'CapsLock' ) then @_set_capslock_state not @_capslock_active
       else                                @_set_capslock_state event.getModifierState 'CapsLock'
       return null
     #.......................................................................................................
     µ.DOM.on document, 'keyup', ( event ) =>
-      handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
+      # handle_kblike_event event ### !!!!!!!!!!!!!!!!!!!!!! ###
       ### TAINT logic is questionable ###
       return null if event.key is 'CapsLock'
       @_set_capslock_state event.getModifierState 'CapsLock'
@@ -319,13 +326,18 @@ class @Kb extends @_Kb
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _listen_to_key: ( keyname, behavior, watcher ) =>
+  _handler_from_watcher: ( watcher ) =>
+    ### TAINT could use single function for all handlers that emit the same event ###
     validate.kb_watcher watcher
-    if isa.function watcher then  handler = watcher
-    else                          handler = ( d ) -> µ.DOM.emit_custom_event watcher, { detail: d, }
+    return watcher if isa.function watcher
+    return ( d ) -> µ.DOM.emit_custom_event watcher, { detail: d, }
+
+  #---------------------------------------------------------------------------------------------------------
+  _listen_to_key: ( keyname, behavior, watcher ) =>
     keyname = ' ' if keyname is 'Space'
     validate.kb_keyname keyname
     validate.kb_keytype behavior
+    handler = @_handler_from_watcher watcher
     #.......................................................................................................
     switch behavior
       when 'push'     then @_listen_to_key_push     keyname, handler
