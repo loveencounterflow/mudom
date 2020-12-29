@@ -48,4 +48,7 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 * [ ] absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
 * [ ] documentation
 * [ ] offer browserified builds
+* [ ] allow lists of elements with event binding
+
+
 
