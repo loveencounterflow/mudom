@@ -14,6 +14,7 @@
   - [DOM](#dom)
   - [TEXT](#text)
   - [KB](#kb)
+- [How to use it](#how-to-use-it)
 - [To do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -37,9 +38,14 @@ npm install mudom
 
 Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 
+# How to use it
+
+* runs in the browser using [`browserify`](https://github.com/browserify/browserify)
 
 # To do
 
 * [ ] absorb `µ.keyboard-modifier-emitter.js` (svelte app2)
 * [ ] absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
 * [ ] documentation
+* [ ] offer browserified builds
+
