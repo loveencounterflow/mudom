@@ -6,22 +6,22 @@
 Object.assign @, @types.export()
 
 # #-----------------------------------------------------------------------------------------------------------
-# @declare 'keywatch_keytypes', tests:
-#   "x is a list of keywatch_keytype":     ( x ) -> @isa.list_of 'keywatch_keytype', x
+# @declare 'kb_keytypes', tests:
+#   "x is a list of kb_keytype":     ( x ) -> @isa.list_of 'kb_keytype', x
 #   "x is not empty":                   ( x ) -> not @isa.empty x
 
 #-----------------------------------------------------------------------------------------------------------
-@declare 'keywatch_keytype', tests:
+@declare 'kb_keytype', tests:
   "x is one of 'toggle', 'latch', 'tlatch', 'ptlatch', 'ntlatch', 'push'": \
     ( x ) -> x in [ 'toggle', 'latch', 'tlatch', 'ptlatch', 'ntlatch', 'push', ]
 
 # #-----------------------------------------------------------------------------------------------------------
-# @declare 'keywatch_keynames', tests:
-#   "x is a list of keywatch_keyname":  ( x ) -> @isa.list_of 'keywatch_keyname', x
+# @declare 'kb_keynames', tests:
+#   "x is a list of kb_keyname":  ( x ) -> @isa.list_of 'kb_keyname', x
 #   "x is not empty":                   ( x ) -> not @isa.empty x
 
 #-----------------------------------------------------------------------------------------------------------
-@declare 'keywatch_keyname', tests:
+@declare 'kb_keyname', tests:
   "x is a nonempty_text":      ( x ) -> @isa.nonempty_text x
 
 #-----------------------------------------------------------------------------------------------------------

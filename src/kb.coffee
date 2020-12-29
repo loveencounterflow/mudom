@@ -111,8 +111,8 @@ class @_Kb
   # on_push: ( keynames, handler ) =>
     # keynames  = [ keynames, ] unless isa.list keynames
     # types     = [ types,    ] unless isa.list types
-    # validate.keywatch_keynames  keynames
-    # validate.keywatch_types     types
+    # validate.kb_keynames  keynames
+    # validate.kb_types     types
 
   #---------------------------------------------------------------------------------------------------------
   XXXXXXXXXXXX_foobar: =>
@@ -321,8 +321,8 @@ class @Kb extends @_Kb
   #---------------------------------------------------------------------------------------------------------
   _listen_to_key: ( keyname, behavior, handler ) =>
     keyname = ' ' if keyname is 'Space'
-    validate.keywatch_keyname keyname
-    validate.keywatch_keytype behavior
+    validate.kb_keyname keyname
+    validate.kb_keytype behavior
     #.......................................................................................................
     switch behavior
       when 'push'     then @_listen_to_key_push     keyname, handler
