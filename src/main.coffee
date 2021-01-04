@@ -8,6 +8,17 @@ debug                     = console.debug
   validate }              = require './types'
 
 #-----------------------------------------------------------------------------------------------------------
+INTERTEXT =
+  camelize: ( text ) ->
+    ### thx to https://github.com/lodash/lodash/blob/master/camelCase.js ###
+    words = text.split '-'
+    for idx in [ 1 ... words.length ] by +1
+      word = words[ idx ]
+      continue if word is ''
+      words[ idx ] = word[ 0 ].toUpperCase() + word[ 1 .. ]
+    return words.join ''
+
+#-----------------------------------------------------------------------------------------------------------
 name_of_match_method      = do ->
   element = document.createElement 'div'
   for name in [ 'matches', 'matchesSelector', 'msMatchesSelector', \
