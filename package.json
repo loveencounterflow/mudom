@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/loveencounterflow/mudom#readme",
   "dependencies": {
-    "intertype": "^7.6.2"
+    "intertype": "^7.6.3"
   }
 }
