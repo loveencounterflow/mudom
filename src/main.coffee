@@ -118,11 +118,15 @@ class Dom # extends Multimix
   #=========================================================================================================
   #
   #---------------------------------------------------------------------------------------------------------
-  select:     ( selector, fallback = misfit ) -> @select_from     document, selector, fallback
-  select_all: ( selector                    ) -> @select_all_from document, selector
+  ### NOTE `µ.DOM.select()` to be deprecated in favor of `µ.DOM.select_first()` ###
+  select:       ( selector, fallback = misfit ) -> @select_first    document, selector, fallback
+  select_first: ( selector, fallback = misfit ) -> @select_from     document, selector, fallback
+  select_all:   ( selector                    ) -> @select_all_from document, selector
 
   #---------------------------------------------------------------------------------------------------------
-  select_from: ( element, selector, fallback = misfit ) ->
+  ### NOTE `µ.DOM.select_from()` to be deprecated in favor of `µ.DOM.select_first_from()` ###
+  select_from: ( element, selector, fallback = misfit ) -> @select_first_from element, selector, fallback
+  select_first_from: ( element, selector, fallback = misfit ) ->
     validate.delement element
     validate.nonempty_text selector
     unless ( R = element.querySelector selector )?
