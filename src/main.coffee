@@ -157,6 +157,7 @@ class Dom # extends Multimix
 
   #---------------------------------------------------------------------------------------------------------
   get:              ( element, name             ) -> validate.element element; element.getAttribute name
+  get_numeric:      ( element, name             ) -> parseFloat @get element, name
   # When called with two arguments as in `set div, 'bar'`, will set values-less attribute (`<div bar>`)
   set:              ( element, name, value = '' ) -> validate.element element; element.setAttribute name, value
   #---------------------------------------------------------------------------------------------------------
@@ -182,7 +183,14 @@ class Dom # extends Multimix
     return style.getPropertyValue attribute_name
   ###
   ### TAINT also use pseudo_selector, see above ###
-  get_style_rule:   ( element, name             ) -> ( getComputedStyle element )[ name ] ### validation done by method ###
+  ### validation done by method ###
+  get_style_value:          ( element, name ) ->            ( getComputedStyle element )[ name ]
+  get_numeric_style_value:  ( element, name ) -> parseFloat ( getComputedStyle element )[ name ]
+  ### thx to https://davidwalsh.name/css-variables-javascript ###
+  get_prop_value:           ( element, name ) ->            ( getComputedStyle element ).getPropertyValue name
+  get_numeric_prop_value:   ( element, name ) -> parseFloat ( getComputedStyle element ).getPropertyValue name
+  ### thx to https://davidwalsh.name/css-variables-javascript ###
+  set_global_prop_value:    ( name, value ) -> document.documentElement.style.setProperty name, value
 
   #---------------------------------------------------------------------------------------------------------
   set_style_rule:   ( element, name, value  ) ->
@@ -290,7 +298,8 @@ class Dom # extends Multimix
 
   #---------------------------------------------------------------------------------------------------------
   ### see http://youmightnotneedjquery.com/#get_width ###
-  get_width: ( element ) -> parseFloat ( getComputedStyle element, null ).width
+  get_width:  ( element ) -> @get_numeric_style_value element, 'width'
+  get_height: ( element ) -> @get_numeric_style_value element, 'height'
 
 
   #=========================================================================================================
