@@ -18,16 +18,6 @@ INTERTEXT =
       words[ idx ] = word[ 0 ].toUpperCase() + word[ 1 .. ]
     return words.join ''
 
-#-----------------------------------------------------------------------------------------------------------
-name_of_match_method      = do ->
-  element = document.createElement 'div'
-  for name in [ 'matches', 'matchesSelector', 'msMatchesSelector', \
-    'mozMatchesSelector', 'webkitMatchesSelector', 'oMatchesSelector', ]
-    if element[ name ]?
-      ### TAINT remove element? ###
-      return name
-  return null
-
 
 #===========================================================================================================
 #
@@ -151,9 +141,9 @@ class Dom # extends Multimix
 
   #---------------------------------------------------------------------------------------------------------
   matches_selector: ( element, selector ) ->
-    validate.nonempty_text selector
-    validate.delement element
-    return element[ name_of_match_method ] selector
+    unless isa.function element?.matches
+      throw new Error "^µDOM/select_id@77581^ expected element with `match()` method, got #{µ.TEXT.rpr element}"
+    return element.matches selector
 
   #---------------------------------------------------------------------------------------------------------
   get:              ( element, name             ) -> validate.element element; element.getAttribute name
