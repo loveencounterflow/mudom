@@ -180,7 +180,31 @@ class Dom # extends Multimix
   get_prop_value:           ( element, name ) ->            ( getComputedStyle element ).getPropertyValue name
   get_numeric_prop_value:   ( element, name ) -> parseFloat ( getComputedStyle element ).getPropertyValue name
   ### thx to https://davidwalsh.name/css-variables-javascript ###
+  get_global_prop_value:          ( name ) ->             ( getComputedStyle document ).getPropertyValue name
+  get_numeric_global_prop_value:  ( name ) ->  parseFloat ( getComputedStyle document ).getPropertyValue name
   set_global_prop_value:    ( name, value ) -> document.documentElement.style.setProperty name, value
+# #-----------------------------------------------------------------------------------------------------------
+# set_prop_defaults = ->
+#   ### There shoud be a better way to inject styles ###
+#   return null if _set_prop_defaults
+#   # head_dom = µ.DOM.select_first 'head'
+#   # style_txt = """
+#   # <style>
+#   #   * {
+#   #     outline:       2px solid yellow; }
+#   #   </style>
+#   # """
+#   # head_dom.innerHTML = style_txt + head_dom.innerHTML
+#   tophat_dom = µ.DOM.select_first '#tophat'
+#   µ.DOM.insert_before tophat_dom, µ.DOM.parse_one """
+#   <style>
+#     * {
+#       outline:       2px solid yellow; }
+#     :root {
+#       --hstn-slider-track-bgcolor:    lime; }
+#     </style>
+#   """
+#   return null
 
   #---------------------------------------------------------------------------------------------------------
   set_style_rule:   ( element, name, value  ) ->
