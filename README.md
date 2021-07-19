@@ -49,6 +49,13 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 * [ ] documentation
 * [ ] offer browserified builds
 * [ ] allow lists of elements with event binding
+* [ ] include things like `computedStyleMap()`, `attributeStyleMap`, `computedStyleMap()` from CSS Houdini
+  * https://www.smashingmagazine.com/2020/03/practical-overview-css-houdini/
+  * https://web.dev/houdini-how/?utm_campaign=CSS%2BLayout%2BNews&utm_medium=web&utm_source=CSS_Layout_News_281
+  * https://web.dev/css-props-and-vals/
+  * https://houdini.how/
+
+
 
 
 
