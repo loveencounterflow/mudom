@@ -27,7 +27,8 @@ utilities to handle DOM-related tasks
 ## Installation
 
 ```bash
-npm install mudom
+npm install -g mudom
+browserify -r mudom -o app/static/browserified/mudom.js
 ```
 
 ## API
