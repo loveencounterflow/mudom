@@ -55,7 +55,7 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
   * https://web.dev/houdini-how/?utm_campaign=CSS%2BLayout%2BNews&utm_medium=web&utm_source=CSS_Layout_News_281
   * https://web.dev/css-props-and-vals/
   * https://houdini.how/
-
+* [ ] allow to instantiate with virtual DOM object so µDOM can be used outside the browser
 
 
 
