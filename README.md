@@ -44,17 +44,26 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 
 ## To Do
 
-* [ ] absorb `µ.keyboard-modifier-emitter.js` (svelte app2)
-* [ ] absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
-* [ ] documentation
-* [ ] offer browserified builds
-* [ ] allow lists of elements with event binding
-* [ ] include things like `computedStyleMap()`, `attributeStyleMap`, `computedStyleMap()` from CSS Houdini
+* **[–]** absorb `µ.keyboard-modifier-emitter.js` (svelte app2)
+* **[–]** absorb `src/components/Toolbox/index.svelte#µ_DOM_detect_doublekey_events()`
+* **[–]** documentation
+* **[–]** offer browserified builds
+* **[–]** allow lists of elements with event binding
+* **[–]** include things like `computedStyleMap()`, `attributeStyleMap`, `computedStyleMap()` from CSS Houdini
   * https://www.smashingmagazine.com/2020/03/practical-overview-css-houdini/
   * https://web.dev/houdini-how/?utm_campaign=CSS%2BLayout%2BNews&utm_medium=web&utm_source=CSS_Layout_News_281
   * https://web.dev/css-props-and-vals/
   * https://houdini.how/
+* **[–]** export classes `Dom`, `Text`, &c.
+* **[–]** this should work but doesn't:
 
+  ```coffee
+  sub_document  = iframe.contentDocument
+  first_tracker = µ.DOM.select_first_from sub_document, '.tracker'
+  ```
+
+  Error message is `not a valid delement: HTMLDocument{...`; suspicion is that `HTMLDocument` should be
+  accepted as a (DOM) `element`
 
 
 
