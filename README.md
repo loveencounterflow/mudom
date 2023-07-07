@@ -65,6 +65,11 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 
   Error message is `not a valid delement: HTMLDocument{...`; suspicion is that `HTMLDocument` should be
   accepted as a (DOM) `element`
+
+  **Note** the real problem is not the test `x instanceof Element`, the problem lies in the realm-crossing
+  nature of the `<iframe>` element
+  * solution *might* be to just check for presence of relevant API (like `element.querySelectorAll?`)
+
 * **[–]** allow to instantiate with virtual DOM object so µDOM can be used outside the browser
 
 
