@@ -27,7 +27,8 @@ utilities to handle DOM-related tasks
 ## Installation
 
 ```bash
-npm install mudom
+npm install -g mudom
+browserify -r mudom -o app/static/browserified/mudom.js
 ```
 
 ## API
@@ -64,6 +65,7 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 
   Error message is `not a valid delement: HTMLDocument{...`; suspicion is that `HTMLDocument` should be
   accepted as a (DOM) `element`
+* **[–]** allow to instantiate with virtual DOM object so µDOM can be used outside the browser
 
 
 
