@@ -384,10 +384,11 @@ class Dom # extends Multimix
 #===========================================================================================================
 # MAGIC
 #-----------------------------------------------------------------------------------------------------------
-@_magic = Symbol.for 'µDOM'
-@TEXT   = new Text()
-@DOM    = new Dom()
-@KB     = new ( require './kb' ).Kb()
+@_magic     = Symbol.for 'µDOM'
+@TEXT       = new Text()
+@DOM        = new Dom()
+@LINEFINDER = require './linefinder'
+@KB         = new ( require './kb' ).Kb()
 
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
 # module.exports.log     ?= module.exports.µ.TEXT.log.bind( µ.TEXT )
