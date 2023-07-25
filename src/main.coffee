@@ -390,6 +390,7 @@ class Dom # extends Multimix
 @LINEFINDER = require './linefinder'
 @KB         = new ( require './kb' ).Kb()
 
+
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
 # module.exports.log     ?= module.exports.µ.TEXT.log.bind( µ.TEXT )
 
