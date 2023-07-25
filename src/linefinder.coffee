@@ -20,33 +20,43 @@ class @Linefinder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     defaults =
+      document:           document
       box_element_name:   'div'
       box_class_name:     'box'
       xxx_height_factor:  1 / 2 ### relative minimum height to recognize line step ###
     @cfg = Object.freeze { defaults..., cfg..., }
+    @state  = { scroll_left: null, scroll_top: null, }
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
+  _get_state: ->
+    @scroll_left ?= @cfg.document.scrollLeft
+    @scroll_top  ?= @cfg.document.scrollTop
+    return @state
+
+  #---------------------------------------------------------------------------------------------------------
   _draw_box: ( rectangle, cfg ) ->
+    { scroll_top
+      scroll_left }   = @_get_state
     cfg               = { @cfg..., cfg..., }
-    box               = document.createElement cfg.element_name
-    box.style.top     = document.documentElement.scrollTop  + rectangle.top       + 'px'
-    box.style.left    = document.documentElement.scrollLeft + rectangle.left      + 'px'
-    box.style.width   =                                       rectangle.width - 1 + 'px' # collapse borders
-    box.style.height  =                                       rectangle.height    + 'px'
+    box               = @cfg.document.createElement cfg.element_name
+    box.style.top     = @cfg.scroll_top   + rectangle.top       + 'px'
+    box.style.left    = @cfg.scroll_left  + rectangle.left      + 'px'
+    box.style.width   =                     rectangle.width - 1 + 'px' # collapse borders
+    box.style.height  =                     rectangle.height    + 'px'
     box.classList.add cfg.class_name
-    document.body.appendChild box
+    @cfg.document.body.appendChild box
     return box
 
   #---------------------------------------------------------------------------------------------------------
   draw_box: ( rectangle ) ->
-    box               = document.createElement @cfg.box_element_name
-    box.style.top     = document.documentElement.scrollTop  + rectangle.top       + 'px'
-    box.style.left    = document.documentElement.scrollLeft + rectangle.left      + 'px'
-    box.style.width   =                                       rectangle.width - 1 + 'px' # collapse borders
-    box.style.height  =                                       rectangle.height    + 'px'
+    box               = @cfg.document.createElement @cfg.box_element_name
+    box.style.top     = @cfg.document.documentElement.scrollTop   + rectangle.top       + 'px'
+    box.style.left    = @cfg.document.documentElement.scrollLeft  + rectangle.left      + 'px'
+    box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
+    box.style.height  =                                             rectangle.height    + 'px'
     box.classList.add @cfg.box_class_name
-    document.body.appendChild box
+    @cfg.document.body.appendChild box
     return box
 
   #---------------------------------------------------------------------------------------------------------
@@ -119,3 +129,4 @@ class @Linefinder
       rlnr  = line_count - idx
       yield new Slug { llnr, rlnr, node, rectangle, }
     return null
+
