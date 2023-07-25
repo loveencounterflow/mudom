@@ -1,0 +1,29 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  chrome-a11y-caret-browsing-extension:
+    specifier: ^1.0.2
+    version: 1.0.2
+  intertype:
+    specifier: ^7.6.3
+    version: 7.7.1
+
+packages:
+
+  /chrome-a11y-caret-browsing-extension@1.0.2:
+    resolution: {integrity: sha512-bGuhhXF0lrFKpaQW6Nk+1ifCkdoGGVPBtjvUAPJARA6DDtZ3BfBregNgAhgjV4Y03KRRZyXwXtoe4KH3mBtoSw==}
+    dev: false
+
+  /intertype@7.7.1:
+    resolution: {integrity: sha512-GgGJYdbHaZ5AM4TvxzXSfkgFwAIEl6w3yIFiDY15uc85W41YfSRL0vNuO68tjNQ3gNIJ+U+xOYA8cw9NN8j0JQ==}
+    dependencies:
+      multimix: 5.0.0
+    dev: false
+
+  /multimix@5.0.0:
+    resolution: {integrity: sha512-N9cdGSDDD7kxOV7R6e4iZqsHTZ4F4iiSDWqMcVqx4gEH6HBtRXav39Gj3fgT1YqvBcwPCQuf0Oa5R2cDaLWK8A==}
+    dev: false
