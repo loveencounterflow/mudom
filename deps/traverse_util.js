@@ -1,3 +1,8 @@
+
+
+(function() {
+
+
 /* Copyright (c) 2014 The Chromium Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file. */
@@ -24,7 +29,7 @@
  * @param {string} text The cached text contents of the node.
  * @constructor
  */
-@Cursor = function(node, index, text) {
+const Cursor = function(node, index, text) {
   this.node = node;
   this.index = index;
   this.text = text;
@@ -51,7 +56,7 @@ Cursor.prototype.copyFrom = function(otherCursor) {
  * Utility functions for stateless DOM traversal.
  * @constructor
  */
-@TraverseUtil = function() {};
+const TraverseUtil = function() {};
 
 /**
  * Gets the text representation of a node. This allows us to substitute
@@ -866,3 +871,8 @@ TraverseUtil.getPreviousString = function(
 
   return str;
 };
+
+module.exports.Cursor = Cursor;
+module.exports.TraverseUtil = TraverseUtil;
+
+}).call(this);
