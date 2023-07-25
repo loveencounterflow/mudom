@@ -71,7 +71,10 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
   * solution *might* be to just check for presence of relevant API (like `element.querySelectorAll?`)
 
 * **[–]** allow to instantiate with virtual DOM object so µDOM can be used outside the browser
-
+* **[–]** integrate XPath &c from playlist µDOM2
+* **[–]** remove `µ.DOM.select_*_from()` methods; instead allow `µ.DOM.select_first()`, `µ.DOM.select_all()`
+  to take one or two parameters
+* **[–]** ??? allow to pass in `document` on creation as it can differ from main document within iframes
 
 
 
