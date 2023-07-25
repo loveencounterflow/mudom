@@ -4,6 +4,16 @@
 TU = require '../deps/traverse_util.js'
 
 #===========================================================================================================
+class Slug
+  constructor: ({ llnr, rlnr, node, rectangle, }) ->
+    @llnr       = llnr
+    @rlnr       = rlnr
+    @node       = node
+    @rectangle  = rectangle
+    return undefined
+
+
+#===========================================================================================================
 class @Linefinder
 
   #---------------------------------------------------------------------------------------------------------
@@ -100,3 +110,12 @@ class @Linefinder
         s.max_bottom  - s.min_top       # height
     return null
 
+  #---------------------------------------------------------------------------------------------------------
+  walk_slugs_of_node: ( node ) ->
+    rectangles  = [ ( @walk_line_rectangles_of_node node )..., ]
+    line_count  = rectangles.length
+    for rectangle, idx in rectangles
+      llnr  = idx + 1
+      rlnr  = line_count - idx
+      yield new Slug { llnr, rlnr, node, rectangle, }
+    return null
