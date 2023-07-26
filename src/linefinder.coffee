@@ -20,7 +20,6 @@ class @Linefinder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     defaults =
-      document:           document
       box_element_name:   'div'
       box_class_name:     'box'
       xxx_height_factor:  1 / 2 ### relative minimum height to recognize line step ###
@@ -29,13 +28,13 @@ class @Linefinder
 
   #---------------------------------------------------------------------------------------------------------
   draw_box: ( rectangle ) ->
-    box               = @cfg.document.createElement @cfg.box_element_name
+    box               = document.createElement @cfg.box_element_name
     box.style.top     =  rectangle.top       + 'px'
     box.style.left    =  rectangle.left      + 'px'
     box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
     box.style.height  =                                             rectangle.height    + 'px'
     box.classList.add @cfg.box_class_name
-    @cfg.document.body.appendChild box
+    document.body.appendChild box
     return box
 
   #---------------------------------------------------------------------------------------------------------
@@ -57,11 +56,11 @@ class @Linefinder
       rectangles = @_get_next_chr_rectangles node, c1, c2
       break unless rectangles?
       for rectangle from rectangles
-        yield new DOMRect                                             \
-          rectangle.left + @cfg.document.documentElement.scrollLeft,  \   # left
-          rectangle.top  + @cfg.document.documentElement.scrollTop,   \   # top
-          rectangle.width,                                            \   # width
-          rectangle.height                                                # height
+        yield new DOMRect                                       \
+          rectangle.left + document.documentElement.scrollLeft, \   # left
+          rectangle.top  + document.documentElement.scrollTop,  \   # top
+          rectangle.width,                                      \   # width
+          rectangle.height                                          # height
     return null
 
   #---------------------------------------------------------------------------------------------------------
