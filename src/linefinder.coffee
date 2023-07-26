@@ -30,8 +30,8 @@ class @Linefinder
   #---------------------------------------------------------------------------------------------------------
   draw_box: ( rectangle ) ->
     box               = @cfg.document.createElement @cfg.box_element_name
-    box.style.top     = @cfg.document.documentElement.scrollTop   + rectangle.top       + 'px'
-    box.style.left    = @cfg.document.documentElement.scrollLeft  + rectangle.left      + 'px'
+    box.style.top     =  rectangle.top       + 'px'
+    box.style.left    =  rectangle.left      + 'px'
     box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
     box.style.height  =                                             rectangle.height    + 'px'
     box.classList.add @cfg.box_class_name
@@ -56,7 +56,12 @@ class @Linefinder
     loop
       rectangles = @_get_next_chr_rectangles node, c1, c2
       break unless rectangles?
-      yield from rectangles
+      for rectangle from rectangles
+        yield new DOMRect                                             \
+          rectangle.left + @cfg.document.documentElement.scrollLeft,  \   # left
+          rectangle.top  + @cfg.document.documentElement.scrollTop,   \   # top
+          rectangle.width,                                            \   # width
+          rectangle.height                                                # height
     return null
 
   #---------------------------------------------------------------------------------------------------------
