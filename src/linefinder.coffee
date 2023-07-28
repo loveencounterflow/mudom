@@ -38,6 +38,19 @@ class @Linefinder
     return box
 
   #---------------------------------------------------------------------------------------------------------
+  ### TAINT to be merged with `draw_box()` in new method ###
+  xxx_draw_line_cover: ( rectangle ) ->
+    box               = document.createElement @cfg.box_element_name
+    box.style.top     =  rectangle.top       + 'px'
+    box.style.left    =  rectangle.left      + 'px'
+    box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
+    box.style.height  =                                             rectangle.height    + 'px'
+    box.classList.add @cfg.box_class_name
+    box.classList.add 'cover'
+    document.body.appendChild box
+    return box
+
+  #---------------------------------------------------------------------------------------------------------
   _get_next_chr_rectangles: ( node, c1, c2 ) ->
     TU.TraverseUtil.getNextChar c1, c2, [], false
     selection   = TU.TraverseUtil.setSelection c1, c2
