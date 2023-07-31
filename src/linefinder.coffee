@@ -3,6 +3,11 @@
 
 TU = require '../deps/traverse_util.js'
 
+every  = ( dts, f  ) =>                            setInterval f,                  dts * 1000
+after  = ( dts, f  ) => new Promise ( resolve ) => setTimeout  ( -> resolve f() ), dts * 1000
+sleep  = ( dts     ) => new Promise ( resolve ) => setTimeout  resolve,            dts * 1000
+defer  = ( f = ->  ) => await sleep 0; return await f()
+
 #===========================================================================================================
 class Slug
   constructor: ({ llnr, rlnr, node, rectangle, }) ->
@@ -242,10 +247,12 @@ class Distributor
       unless ø_node.step()? # might want to mark galleys without content at this point
         log '^123-1^', "nodes done"; break
       #.....................................................................................................
+      await defer()
       ø_slug = new Slug_walker linefinder.walk_slugs_of_node ø_node.value
       loop
         unless ø_slug.step()?
           log '^123-1^', "slugs done"; break
+        await defer()
         #...................................................................................................
         unless column?.first_slug?
           column = new Column ø_iframe, ø_slug
