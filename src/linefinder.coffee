@@ -238,12 +238,15 @@ class Distributor
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
+  new_iframe_walker: -> new Iframe_walker ( µ.DOM.select_all @cfg.iframe_selector ).values(), null, @cfg
+
+  #---------------------------------------------------------------------------------------------------------
   distribute_lines: ->
     #.......................................................................................................
     ### Allow user-scrolling for demo ###
     # µ.DOM.set ø_iframe.value, 'scrolling', 'true' for ø_iframe.value in µ.DOM.select_all 'ø_iframe.value'
     #.......................................................................................................
-    ø_iframe          = new Iframe_walker ( µ.DOM.select_all @cfg.iframe_selector ).values(), null, @cfg
+    ø_iframe          = @new_iframe_walker()
     ø_iframe.step()
     ø_node            = new Node_walker ( ø_iframe.window.µ.DOM.select_all @cfg.paragraph_selector ).values()
     linefinder        = new ø_iframe.window.µ.LINE.Finder @cfg
