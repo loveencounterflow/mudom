@@ -33,4 +33,7 @@ Object.assign @, @types.export()
 @declare 'delement',       ( x ) -> ( x is document ) or ( x instanceof Element )
 @declare 'element',        ( x ) -> x instanceof Element
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'ready_callable', ( x ) -> ( @isa.function x ) or ( @isa.asyncfunction x )
+
 

@@ -52,7 +52,7 @@ class Dom # extends Multimix
   ready: ( f ) ->
     # thx to https://stackoverflow.com/a/7053197/7568091
     # function r(f){/in/.test(document.readyState)?setTimeout(r,9,f):f()}
-    validate.function f
+    validate.ready_callable f
     return ( setTimeout ( => @ready f ), 9 ) if /in/.test document.readyState
     return f()
 
