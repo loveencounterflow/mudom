@@ -1,6 +1,6 @@
 {
   "name": "mudom",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "µDOM utilities",
   "main": "lib/main.js",
   "scripts": {
