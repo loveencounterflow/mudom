@@ -227,6 +227,10 @@ class Iframe_walker extends Walker
 class Distributor
 
   #---------------------------------------------------------------------------------------------------------
+  @is_galley_document:  -> (     µ.DOM.page_is_inside_iframe() ) and ( µ.DOM.select_first 'galley', null )?
+  @is_main_document:    -> ( not µ.DOM.page_is_inside_iframe() ) and ( µ.DOM.select_first 'iframe', null )?
+
+  #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
     ### TAINT use `intertype` ###
     @cfg = Object.freeze { defaults.distributor_cfg..., cfg..., }
@@ -235,19 +239,10 @@ class Distributor
   #---------------------------------------------------------------------------------------------------------
   distribute_lines: ->
     #.......................................................................................................
-    if µ.DOM.page_is_inside_iframe()
-      log '^123-9^', "leaving b/c document is loaded in iframe"
-      return null
-    #.......................................................................................................
-    _iframes = µ.DOM.select_all @cfg.iframe_selector
-    unless _iframes.length > 0
-      log '^123-10^', "leaving b/c document does not have iframes"
-      return null
-    #.......................................................................................................
     ### Allow user-scrolling for demo ###
     # µ.DOM.set ø_iframe.value, 'scrolling', 'true' for ø_iframe.value in µ.DOM.select_all 'ø_iframe.value'
     #.......................................................................................................
-    ø_iframe          = new Iframe_walker _iframes.values(), null, @cfg
+    ø_iframe          = new Iframe_walker ( µ.DOM.select_all @cfg.iframe_selector ).values(), null, @cfg
     ø_iframe.step()
     ø_node            = new Node_walker ( ø_iframe.window.µ.DOM.select_all @cfg.paragraph_selector ).values()
     linefinder        = new ø_iframe.window.µ.LINE.Finder @cfg
