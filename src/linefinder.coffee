@@ -3,10 +3,28 @@
 
 TU = require '../deps/traverse_util.js'
 
+#===========================================================================================================
 every  = ( dts, f  ) =>                            setInterval f,                  dts * 1000
 after  = ( dts, f  ) => new Promise ( resolve ) => setTimeout  ( -> resolve f() ), dts * 1000
 sleep  = ( dts     ) => new Promise ( resolve ) => setTimeout  resolve,            dts * 1000
 defer  = ( f = ->  ) => await sleep 0; return await f()
+
+#===========================================================================================================
+### TAINT to be integrated with types ###
+defaults = {}
+#...........................................................................................................
+defaults.finder_cfg =
+  ### TAINT inconsistent naming ###
+  box_element_name:   'div'
+  box_class_name:     'box'
+  cover_class_name:   'cover'
+  xxx_height_factor:  1 / 2 ### relative minimum height to recognize line step ###
+#...........................................................................................................
+defaults.distributor_cfg =
+  paragraph_selector:   'galley > p'
+  iframe_selector:      'iframe'
+defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
+
 
 #===========================================================================================================
 class Slug
@@ -24,11 +42,7 @@ class Finder
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
-    defaults =
-      box_element_name:   'div'
-      box_class_name:     'box'
-      xxx_height_factor:  1 / 2 ### relative minimum height to recognize line step ###
-    @cfg = Object.freeze { defaults..., cfg..., }
+    @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -36,8 +50,8 @@ class Finder
     box               = document.createElement @cfg.box_element_name
     box.style.top     =  rectangle.top       + 'px'
     box.style.left    =  rectangle.left      + 'px'
-    box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
-    box.style.height  =                                             rectangle.height    + 'px'
+    box.style.width   =  rectangle.width - 1 + 'px' # collapse borders
+    box.style.height  =  rectangle.height    + 'px'
     box.classList.add @cfg.box_class_name
     document.body.appendChild box
     return box
@@ -48,10 +62,10 @@ class Finder
     box               = document.createElement @cfg.box_element_name
     box.style.top     =  rectangle.top       + 'px'
     box.style.left    =  rectangle.left      + 'px'
-    box.style.width   =                                             rectangle.width - 1 + 'px' # collapse borders
-    box.style.height  =                                             rectangle.height    + 'px'
+    box.style.width   =  rectangle.width - 1 + 'px' # collapse borders
+    box.style.height  =  rectangle.height    + 'px'
     box.classList.add @cfg.box_class_name
-    box.classList.add 'cover'
+    box.classList.add @cfg.cover_class_name
     document.body.appendChild box
     return box
 
@@ -185,13 +199,14 @@ class Slug_walker extends Walker
 class Iframe_walker extends Walker
 
   #---------------------------------------------------------------------------------------------------------
-  constructor: ( iterator, stop = null ) ->
+  constructor: ( iterator, stop = null, cfg ) ->
     super iterator, stop
     @height                 = null
     # @galley_document        = null
     @window                 = null
     @draw_box               = null
     @draw_line_cover        = null
+    @cfg                    = cfg
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -202,7 +217,7 @@ class Iframe_walker extends Walker
     # @galley_document        = @value.contentDocument
     @window                 = @value.contentWindow
     ### TAINT may want to return `linefinder` itself ###
-    local_linefinder        = new @window.µ.LINE.Finder()
+    local_linefinder        = new @window.µ.LINE.Finder @cfg
     @draw_box               = local_linefinder.draw_box.bind            local_linefinder
     @draw_line_cover        = local_linefinder.xxx_draw_line_cover.bind local_linefinder
     return @value
@@ -214,10 +229,7 @@ class Distributor
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
     ### TAINT use `intertype` ###
-    defaults =
-      paragraph_selector:   'galley > p'
-      iframe_selector:      'iframe'
-    @cfg = Object.freeze { defaults..., cfg..., }
+    @cfg = Object.freeze { defaults.distributor_cfg..., cfg..., }
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -235,10 +247,10 @@ class Distributor
     ### Allow user-scrolling for demo ###
     # µ.DOM.set ø_iframe.value, 'scrolling', 'true' for ø_iframe.value in µ.DOM.select_all 'ø_iframe.value'
     #.......................................................................................................
-    ø_iframe          = new Iframe_walker _iframes.values()
+    ø_iframe          = new Iframe_walker _iframes.values(), null, @cfg
     ø_iframe.step()
     ø_node            = new Node_walker ( ø_iframe.window.µ.DOM.select_all @cfg.paragraph_selector ).values()
-    linefinder        = new ø_iframe.window.µ.LINE.Finder()
+    linefinder        = new ø_iframe.window.µ.LINE.Finder @cfg
     column            = null
     #.......................................................................................................
     loop
