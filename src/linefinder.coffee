@@ -170,6 +170,7 @@ class Column
 
 #===========================================================================================================
 class Walker
+  ### TAINT should add `next` method (or well-known symbol) to make it an iterator ###
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( iterator, stop = null ) ->
