@@ -157,7 +157,6 @@ class Finder
   _inject_stylesheet: ( where, ref ) ->
     element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
     stylesheet  = @_get_stylesheet()
-    log '^3428436^', stylesheet, element
     switch where
       when 'before' then µ.DOM.insert_before  element, stylesheet
       when 'after'  then µ.DOM.insert_after   element, stylesheet
