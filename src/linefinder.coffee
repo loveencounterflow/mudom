@@ -15,14 +15,16 @@ defaults = {}
 #...........................................................................................................
 defaults.finder_cfg =
   ### TAINT inconsistent naming ###
-  box_element_name:   'div'
-  box_class_name:     'box'
-  cover_class_name:   'cover'
-  xxx_height_factor:  1 / 2 ### relative minimum height to recognize line step ###
+  box_element_name:         'div'
+  box_class_name:           'box'
+  cover_class_name:         'cover'
+  xxx_height_factor:        1 / 2 ### relative minimum height to recognize line step ###
+  inject_stylesheet_after:  null
+  inject_stylesheet_before: null
 #...........................................................................................................
 defaults.distributor_cfg =
-  paragraph_selector:   'galley > p'
-  iframe_selector:      'iframe'
+  paragraph_selector:       'galley > p'
+  iframe_selector:          'iframe'
 defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
 
 
@@ -43,6 +45,8 @@ class Finder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
+    @_inject_stylesheet 'after',  @cfg.inject_stylesheet_after  if @cfg.inject_stylesheet_after?
+    @_inject_stylesheet 'before', @cfg.inject_stylesheet_before if @cfg.inject_stylesheet_before?
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -144,6 +148,49 @@ class Finder
       rlnr  = line_count - idx
       yield new Slug { llnr, rlnr, node, rectangle, }
     return null
+
+  #---------------------------------------------------------------------------------------------------------
+  inject_stylesheet_before: ( element_or_selector ) -> @_inject_stylesheet 'before', element_or_selector
+  inject_stylesheet_after:  ( element_or_selector ) -> @_inject_stylesheet 'after',  element_or_selector
+
+  #---------------------------------------------------------------------------------------------------------
+  _inject_stylesheet: ( where, ref ) ->
+    element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
+    stylesheet  = @_get_stylesheet()
+    log '^3428436^', stylesheet, element
+    switch where
+      when 'before' then µ.DOM.insert_before  element, stylesheet
+      when 'after'  then µ.DOM.insert_after   element, stylesheet
+      else "unknown location #{µ.TEXT.rpr where}"
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _get_stylesheet: ->
+    ### TAINT must honour element, class name configuration ###
+    return µ.DOM.new_stylesheet """
+      .debug iframe {
+        outline:                1px dotted red; }
+
+      /* ### TAINT use explicit class for debugging line box (as for cover) */
+      .box {
+        background-color:       transparent;
+        pointer-events:         none;
+        position:               absolute; }
+
+      .debug .box {
+        background-color:       rgba( 255, 248, 0, 0.2 );
+        outline:                1px solid rgba( 255, 0, 0, 0.2 );
+        mix-blend-mode:         multiply; }
+
+      .box.cover {
+        background-color:       white;
+        pointer-events:         none;
+        position:               absolute; }
+
+      .debug .box.cover {
+        background-color:       rgba( 255, 0, 0, 0.2 );
+        mix-blend-mode:         multiply; }
+      """
 
 
 #===========================================================================================================
@@ -291,4 +338,6 @@ class Distributor
     return null
 
 
+
 module.exports = { Finder, Distributor, }
+
