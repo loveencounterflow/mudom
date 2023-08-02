@@ -75,6 +75,7 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 * **[–]** remove `µ.DOM.select_*_from()` methods; instead allow `µ.DOM.select_first()`, `µ.DOM.select_all()`
   to take one or two parameters
 * **[–]** ??? allow to pass in `document` on creation as it can differ from main document within iframes
+* **[–]** don't reference `µ` from with libraries, use private ref to avoid name collisions
 
 
 
