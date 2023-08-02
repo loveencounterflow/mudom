@@ -213,6 +213,12 @@ class Dom # extends Multimix
     validate.nonempty_text name
     element.style[ INTERTEXT.camelize name ] = value
 
+  #---------------------------------------------------------------------------------------------------------
+  new_stylesheet: ( text = '' ) ->
+    R = document.createElement 'style'
+    R.appendChild document.createTextNode text
+    return R
+
 
   #=========================================================================================================
   # ELEMENT CREATION
