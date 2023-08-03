@@ -25,6 +25,7 @@ defaults.finder_cfg =
 defaults.distributor_cfg =
   paragraph_selector:       'galley > p'
   iframe_selector:          'iframe'
+  iframe_scrolling:         false
 defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
 
 
@@ -264,6 +265,7 @@ class Iframe_walker extends Walker
   step: ->
     super()
     return @_stop if @done
+    µ.DOM.set @value, 'scrolling', 'no' unless @cfg.iframe_scrolling
     @height                 = µ.DOM.get_height @value
     # @galley_document        = @value.contentDocument
     @window                 = @value.contentWindow
