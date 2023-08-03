@@ -15,9 +15,8 @@ defaults = {}
 #...........................................................................................................
 defaults.finder_cfg =
   ### TAINT inconsistent naming ###
-  box_element_name:         'div'
-  box_class_name:           'box'
-  cover_class_name:         'cover'
+  linemarker_tagname:       'pl-linemarker'
+  linecover_tagname:        'pl-linecover'
   debug_class_name:         'debug'
   xxx_height_factor:        1 / 2 ### relative minimum height to recognize line step ###
   inject_stylesheet_after:  null
@@ -52,25 +51,22 @@ class Finder
 
   #---------------------------------------------------------------------------------------------------------
   draw_box: ( rectangle ) ->
-    box               = document.createElement @cfg.box_element_name
+    box               = document.createElement @cfg.linemarker_tagname
     box.style.top     =  rectangle.top       + 'px'
     box.style.left    =  rectangle.left      + 'px'
     box.style.width   =  rectangle.width - 1 + 'px' # collapse borders
     box.style.height  =  rectangle.height    + 'px'
-    box.classList.add @cfg.box_class_name
     document.body.appendChild box
     return box
 
   #---------------------------------------------------------------------------------------------------------
   ### TAINT to be merged with `draw_box()` in new method ###
   xxx_draw_line_cover: ( rectangle ) ->
-    box               = document.createElement @cfg.box_element_name
+    box               = document.createElement @cfg.linecover_tagname
     box.style.top     =  rectangle.top       + 'px'
     box.style.left    =  rectangle.left      + 'px'
     box.style.width   =  rectangle.width - 1 + 'px' # collapse borders
     box.style.height  =  rectangle.height    + 'px'
-    box.classList.add @cfg.box_class_name
-    box.classList.add @cfg.cover_class_name
     document.body.appendChild box
     return box
 
@@ -173,22 +169,22 @@ class Finder
         outline:                1px dotted red; }
 
       /* ### TAINT use explicit class for debugging line box (as for cover) */
-      #{@cfg.box_element_name}.#{@cfg.box_class_name} {
+      #{@cfg.linemarker_tagname} {
         background-color:       transparent;
         pointer-events:         none;
         position:               absolute; }
 
-      .#{@cfg.debug_class_name} #{@cfg.box_element_name}.#{@cfg.box_class_name} {
+      .#{@cfg.debug_class_name} #{@cfg.linemarker_tagname} {
         background-color:       rgba( 255, 248, 0, 0.2 );
         outline:                1px solid rgba( 255, 0, 0, 0.2 );
         mix-blend-mode:         multiply; }
 
-      #{@cfg.box_element_name}.#{@cfg.box_class_name}.#{@cfg.cover_class_name} {
+      #{@cfg.linecover_tagname} {
         background-color:       white;
         pointer-events:         none;
         position:               absolute; }
 
-      .#{@cfg.debug_class_name} #{@cfg.box_element_name}.#{@cfg.box_class_name}.#{@cfg.cover_class_name} {
+      .#{@cfg.debug_class_name} #{@cfg.linecover_tagname} {
         background-color:       rgba( 255, 0, 0, 0.2 );
         mix-blend-mode:         multiply; }
       """
