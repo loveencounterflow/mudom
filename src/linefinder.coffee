@@ -18,6 +18,7 @@ defaults.finder_cfg =
   box_element_name:         'div'
   box_class_name:           'box'
   cover_class_name:         'cover'
+  debug_class_name:         'debug'
   xxx_height_factor:        1 / 2 ### relative minimum height to recognize line step ###
   inject_stylesheet_after:  null
   inject_stylesheet_before: null
@@ -166,27 +167,28 @@ class Finder
   #---------------------------------------------------------------------------------------------------------
   _get_stylesheet: ->
     ### TAINT must honour element, class name configuration ###
+    ### https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/insertRule ###
     return µ.DOM.new_stylesheet """
-      .debug iframe {
+      .#{@cfg.debug_class_name} iframe {
         outline:                1px dotted red; }
 
       /* ### TAINT use explicit class for debugging line box (as for cover) */
-      .box {
+      #{@cfg.box_element_name}.#{@cfg.box_class_name} {
         background-color:       transparent;
         pointer-events:         none;
         position:               absolute; }
 
-      .debug .box {
+      .#{@cfg.debug_class_name} #{@cfg.box_element_name}.#{@cfg.box_class_name} {
         background-color:       rgba( 255, 248, 0, 0.2 );
         outline:                1px solid rgba( 255, 0, 0, 0.2 );
         mix-blend-mode:         multiply; }
 
-      .box.cover {
+      #{@cfg.box_element_name}.#{@cfg.box_class_name}.#{@cfg.cover_class_name} {
         background-color:       white;
         pointer-events:         none;
         position:               absolute; }
 
-      .debug .box.cover {
+      .#{@cfg.debug_class_name} #{@cfg.box_element_name}.#{@cfg.box_class_name}.#{@cfg.cover_class_name} {
         background-color:       rgba( 255, 0, 0, 0.2 );
         mix-blend-mode:         multiply; }
       """
