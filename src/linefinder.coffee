@@ -169,7 +169,6 @@ class Finder
       .#{@cfg.debug_class_name} iframe {
         outline:                1px dotted red; }
 
-      /* ### TAINT use explicit class for debugging line box (as for cover) */
       #{@cfg.linemarker_tagname} {
         background-color:       transparent;
         pointer-events:         none;
