@@ -13,6 +13,7 @@
 - [API](#api)
   - [DOM](#dom)
   - [TEXT](#text)
+  - [LINE](#line)
   - [KB](#kb)
 - [How to Use It](#how-to-use-it)
 - [To Do](#to-do)
@@ -35,6 +36,17 @@ browserify -r mudom -o app/static/browserified/mudom.js
 
 ### DOM
 ### TEXT
+### LINE
+
+`µ.LINE.Finder` and `µ.LINE.Distributor` are two classes that allow users to
+
+* find and mark indivdual lines in running text, and to
+* flow paragraphs across multiple rectangular sections of the layout similar to how
+  layout programs like InDesign or [Scribus](https://www.scribus.net) work.
+
+[Read the documentation for `µ.LINE`.](./README-linefinder.md)
+
+
 ### KB
 
 Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
