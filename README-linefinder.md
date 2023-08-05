@@ -48,11 +48,11 @@
 The CSS rules defined in the injected stylesheet are:
 
 ```css
-# for normal look:
+/* for normal look: */
 ${linemarker_tagname} { ... }
 ${linecover_tagname} { ... }
 
-# for debugging:
+/* for debugging: */
 .${debug_class_name} iframe { ... }
 .${debug_class_name} ${linemarker_tagname} { ... }
 .${debug_class_name} ${linecover_tagname} { ... }
