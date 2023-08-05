@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [`µ.LINE`: Distribute Lines across HTML IFrames](#%C2%B5line-distribute-lines-across-html-iframes)
+  - [How it Works and What it Does](#how-it-works-and-what-it-does)
   - [`µ.LINE.Finder`](#%C2%B5linefinder)
     - [Configuration](#configuration)
   - [`µ.LINE.Distributor`](#%C2%B5linedistributor)
@@ -12,6 +13,10 @@
 
 
 # `µ.LINE`: Distribute Lines across HTML IFrames
+
+## How it Works and What it Does
+
+
 
 ## `µ.LINE.Finder`
 
@@ -38,15 +43,19 @@
   For example, if you have a linked CSS-Reset stylesheet, you typically want to have that to be the first
   stylesheet with all the defaults; it would then be appropriate to call `finder.inject_stylesheet_after
   'link[href$="reset.css"]'` with the default styles for the `pl-linemarker` and `pl-linecover` elements.
+  *Note* that the selector can match one or more elements; only the first match will be considered.
 
-The CSS classes defined in the injected stylesheet are:
+The CSS rules defined in the injected stylesheet are:
 
 ```css
-.$debug_class_name iframe { ... }
-$linemarker_tagname { ... }
-.$debug_class_name $linemarker_tagname { ... }
-$linecover_tagname { ... }
-.$debug_class_name $linecover_tagname { ... }
+# for normal look:
+${linemarker_tagname} { ... }
+${linecover_tagname} { ... }
+
+# for debugging:
+.${debug_class_name} iframe { ... }
+.${debug_class_name} ${linemarker_tagname} { ... }
+.${debug_class_name} ${linecover_tagname} { ... }
 ```
 
 
