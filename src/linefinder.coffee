@@ -18,7 +18,7 @@ defaults.finder_cfg =
   linemarker_tagname:       'pl-linemarker'
   linecover_tagname:        'pl-linecover'
   debug_class_name:         'debug'
-  xxx_height_factor:        1 / 2 ### relative minimum height to recognize line step ###
+  line_step_factor:        1 / 2 ### relative minimum height to recognize line step ###
   inject_stylesheet_after:  null
   inject_stylesheet_before: null
 #...........................................................................................................
@@ -112,7 +112,7 @@ class Finder
   walk_line_rectangles_of_node: ( node ) ->
     @_reset_line_walker s  = {}
     for rectangle from @walk_chr_rectangles_of_node node
-      if s.count > 0 and rectangle.bottom - s.avg_bottom > s.avg_height * @cfg.xxx_height_factor
+      if s.count > 0 and rectangle.bottom - s.avg_bottom > s.avg_height * @cfg.line_step_factor
         yield new DOMRect             \
           s.min_left,                 \   # left
           s.min_top,                  \   # top
