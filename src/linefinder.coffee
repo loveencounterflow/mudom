@@ -18,9 +18,11 @@ defaults.finder_cfg =
   linemarker_tagname:       'pl-linemarker'
   linecover_tagname:        'pl-linecover'
   debug_class_name:         'debug'
+  debug_button_id:          'pl-debugbutton'
   line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
   insert_stylesheet_after:  null
   insert_stylesheet_before: null
+  insert_debug_button:      true
 #...........................................................................................................
 defaults.distributor_cfg =
   paragraph_selector:       'galley > p'
@@ -46,8 +48,9 @@ class Finder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
-    @_insert_stylesheet 'after',  @cfg.insert_stylesheet_after  if @cfg.insert_stylesheet_after?
-    @_insert_stylesheet 'before', @cfg.insert_stylesheet_before if @cfg.insert_stylesheet_before?
+    @_insert_stylesheet   'after',  @cfg.insert_stylesheet_after    if @cfg.insert_stylesheet_after?
+    @_insert_stylesheet   'before', @cfg.insert_stylesheet_before   if @cfg.insert_stylesheet_before?
+    @insert_debug_button()                                          if @cfg.insert_debug_button
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -148,13 +151,15 @@ class Finder
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  insert_stylesheet_before: ( element_or_selector ) -> @_insert_stylesheet 'before', element_or_selector
-  insert_stylesheet_after:  ( element_or_selector ) -> @_insert_stylesheet 'after',  element_or_selector
+  insert_stylesheet_before:   ( element_or_selector ) -> @_insert_stylesheet   'before', element_or_selector
+  insert_stylesheet_after:    ( element_or_selector ) -> @_insert_stylesheet   'after',  element_or_selector
 
   #---------------------------------------------------------------------------------------------------------
   _insert_stylesheet: ( where, ref ) ->
+    ### TAINT code duplication ###
     element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
     stylesheet  = @_get_stylesheet()
+    log '^535453^', stylesheet
     switch where
       when 'before' then µ.DOM.insert_before  element, stylesheet
       when 'after'  then µ.DOM.insert_after   element, stylesheet
@@ -187,7 +192,31 @@ class Finder
       .#{@cfg.debug_class_name} #{@cfg.linecover_tagname} {
         background-color:       rgba( 255, 0, 0, 0.2 );
         mix-blend-mode:         multiply; }
+
+      /* ### TAINT replace magic numbers */
+      button##{@cfg.debug_button_id} {
+        position:               fixed;
+        top:                    3mm;
+        left:                   95mm; }
       """
+
+  #---------------------------------------------------------------------------------------------------------
+  insert_debug_button: ->
+    log '^236473627^', @_get_debug_button()
+    µ.DOM.insert_as_first ( µ.DOM.select_first 'body' ), @_get_debug_button()
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _get_debug_button: ->
+    # R = µ.DOM.new_element 'button'
+    R = µ.DOM.parse_one "<button>DEBUG</button>"
+    µ.DOM.set R, 'id', @cfg.debug_button_id
+    µ.DOM.on R, 'click', ->
+      µ.DOM.toggle_class ( µ.DOM.select_first 'body' ), @cfg.debug_class_name
+      for ø_iframe from distributor.new_iframe_walker()
+        galley_µ = ø_iframe.window.µ
+        galley_µ.DOM.toggle_class ( galley_µ.DOM.select_first 'body' ), @cfg.debug_class_name
+    return R
 
 
 #===========================================================================================================
