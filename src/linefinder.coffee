@@ -18,9 +18,9 @@ defaults.finder_cfg =
   linemarker_tagname:       'pl-linemarker'
   linecover_tagname:        'pl-linecover'
   debug_class_name:         'debug'
-  line_step_factor:        1 / 2 ### relative minimum height to recognize line step ###
-  inject_stylesheet_after:  null
-  inject_stylesheet_before: null
+  line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
+  insert_stylesheet_after:  null
+  insert_stylesheet_before: null
 #...........................................................................................................
 defaults.distributor_cfg =
   paragraph_selector:       'galley > p'
@@ -46,8 +46,8 @@ class Finder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
-    @_inject_stylesheet 'after',  @cfg.inject_stylesheet_after  if @cfg.inject_stylesheet_after?
-    @_inject_stylesheet 'before', @cfg.inject_stylesheet_before if @cfg.inject_stylesheet_before?
+    @_insert_stylesheet 'after',  @cfg.insert_stylesheet_after  if @cfg.insert_stylesheet_after?
+    @_insert_stylesheet 'before', @cfg.insert_stylesheet_before if @cfg.insert_stylesheet_before?
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -148,11 +148,11 @@ class Finder
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  inject_stylesheet_before: ( element_or_selector ) -> @_inject_stylesheet 'before', element_or_selector
-  inject_stylesheet_after:  ( element_or_selector ) -> @_inject_stylesheet 'after',  element_or_selector
+  insert_stylesheet_before: ( element_or_selector ) -> @_insert_stylesheet 'before', element_or_selector
+  insert_stylesheet_after:  ( element_or_selector ) -> @_insert_stylesheet 'after',  element_or_selector
 
   #---------------------------------------------------------------------------------------------------------
-  _inject_stylesheet: ( where, ref ) ->
+  _insert_stylesheet: ( where, ref ) ->
     element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
     stylesheet  = @_get_stylesheet()
     switch where
