@@ -85,7 +85,7 @@ class Finder
 
   #---------------------------------------------------------------------------------------------------------
   walk_chr_rectangles_of_node: ( node ) ->
-    text_node     = node.childNodes[ 0 ]
+    return null unless ( text_node = node.childNodes[ 0 ] )?
     c1            = new TU.Cursor text_node, 0, text_node.data
     c2            = new TU.Cursor text_node, 0, text_node.data
     TU.TraverseUtil.setSelection c1, c2
