@@ -211,11 +211,12 @@ class Finder
     # R = µ.DOM.new_element 'button'
     R = µ.DOM.parse_one "<button>DEBUG</button>"
     µ.DOM.set R, 'id', @cfg.debug_button_id
-    µ.DOM.on R, 'click', ->
+    µ.DOM.on R, 'click', =>
       µ.DOM.toggle_class ( µ.DOM.select_first 'body' ), @cfg.debug_class_name
       for ø_iframe from distributor.new_iframe_walker()
         galley_µ = ø_iframe.window.µ
         galley_µ.DOM.toggle_class ( galley_µ.DOM.select_first 'body' ), @cfg.debug_class_name
+      return null
     return R
 
 
