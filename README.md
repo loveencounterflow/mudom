@@ -88,6 +88,8 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
   to take one or two parameters
 * **[–]** ??? allow to pass in `document` on creation as it can differ from main document within iframes
 * **[–]** don't reference `µ` from with libraries, use private ref to avoid name collisions
+* **[–]** in `LINE.Distributor::constructor`, we create a `Finder` instance only to insert the Linefinder
+  stylesheet; doing it this way means the document in the iframe gets multiple copies
 
 
 
