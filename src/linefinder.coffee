@@ -198,6 +198,10 @@ class Finder
         position:               fixed;
         top:                    3mm;
         left:                   95mm; }
+
+      @media print {
+        button##{@cfg.debug_button_id} {
+          display: none !important; } }
       """
 
   #---------------------------------------------------------------------------------------------------------
