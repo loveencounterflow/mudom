@@ -58,6 +58,13 @@ ${linecover_tagname} { ... }
 .${debug_class_name} ${linecover_tagname} { ... }
 ```
 
+The debug button has these style selectors:
+
+```css
+button#${debug_button_id} { ... }
+@media print { button#${debug_button_id} { ... } }
+```
+
 
 
 ## `µ.LINE.Distributor`
