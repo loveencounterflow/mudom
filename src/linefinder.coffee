@@ -22,12 +22,12 @@ defaults.finder_cfg =
   line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
   insert_stylesheet_after:  null
   insert_stylesheet_before: null
-  insert_debug_button:      true
 #...........................................................................................................
 defaults.distributor_cfg =
   paragraph_selector:       'galley > p'
   iframe_selector:          'iframe'
   iframe_scrolling:         false
+  insert_debug_button:      true
 defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
 
 
@@ -50,7 +50,6 @@ class Finder
     @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
     @_insert_stylesheet   'after',  @cfg.insert_stylesheet_after    if @cfg.insert_stylesheet_after?
     @_insert_stylesheet   'before', @cfg.insert_stylesheet_before   if @cfg.insert_stylesheet_before?
-    @insert_debug_button()                                          if @cfg.insert_debug_button
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -204,25 +203,6 @@ class Finder
           display: none !important; } }
       """
 
-  #---------------------------------------------------------------------------------------------------------
-  insert_debug_button: ->
-    log '^236473627^', @_get_debug_button()
-    µ.DOM.insert_as_first ( µ.DOM.select_first 'body' ), @_get_debug_button()
-    return null
-
-  #---------------------------------------------------------------------------------------------------------
-  _get_debug_button: ->
-    # R = µ.DOM.new_element 'button'
-    R = µ.DOM.parse_one "<button>DEBUG</button>"
-    µ.DOM.set R, 'id', @cfg.debug_button_id
-    µ.DOM.on R, 'click', =>
-      µ.DOM.toggle_class ( µ.DOM.select_first 'body' ), @cfg.debug_class_name
-      for ø_iframe from distributor.new_iframe_walker()
-        galley_µ = ø_iframe.window.µ
-        galley_µ.DOM.toggle_class ( galley_µ.DOM.select_first 'body' ), @cfg.debug_class_name
-      return null
-    return R
-
 
 #===========================================================================================================
 class Column
@@ -320,6 +300,10 @@ class Distributor
   constructor: ( cfg ) ->
     ### TAINT use `intertype` ###
     @cfg = Object.freeze { defaults.distributor_cfg..., cfg..., }
+    ### TAINT we create this object only to insert the Linefinder stylesheet ###
+    ### TAINT doing it this way means the document in the iframe gets multiple copies ###
+    dummy_linefinder = new Finder @cfg
+    @insert_debug_button() if @cfg.insert_debug_button
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -388,6 +372,24 @@ class Distributor
         linefinder.draw_box ø_slug.value.rectangle
     #.......................................................................................................
     return null
+
+  #---------------------------------------------------------------------------------------------------------
+  insert_debug_button: ->
+    log '^236473627^', @_get_debug_button()
+    µ.DOM.insert_as_first ( µ.DOM.select_first 'body' ), @_get_debug_button()
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _get_debug_button: ->
+    R = µ.DOM.parse_one "<button>DEBUG</button>"
+    µ.DOM.set R, 'id', @cfg.debug_button_id
+    µ.DOM.on R, 'click', =>
+      µ.DOM.toggle_class ( µ.DOM.select_first 'body' ), @cfg.debug_class_name
+      for ø_iframe from @new_iframe_walker()
+        galley_µ = ø_iframe.window.µ
+        galley_µ.DOM.toggle_class ( galley_µ.DOM.select_first 'body' ), @cfg.debug_class_name
+      return null
+    return R
 
 
 
