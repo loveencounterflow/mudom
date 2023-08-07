@@ -369,6 +369,26 @@ class Distributor
     #.......................................................................................................
     return null
 
+  #---------------------------------------------------------------------------------------------------------
+  mark_lines: ->
+    ø_node            = new Node_walker ( µ.DOM.select_all @cfg.paragraph_selector ).values()
+    linefinder        = new µ.LINE.Finder @cfg
+    #.......................................................................................................
+    loop
+      #.....................................................................................................
+      unless ø_node.step()? # might want to mark galleys without content at this point
+        log '^123-1^', "nodes done"; break
+      #.....................................................................................................
+      await defer()
+      ø_slug = new Slug_walker linefinder.walk_slugs_of_node ø_node.value
+      loop
+        unless ø_slug.step()?
+          log '^123-1^', "slugs done"; break
+        await defer()
+        linefinder.draw_box ø_slug.value.rectangle
+    #.......................................................................................................
+    return null
+
 
 
 module.exports = { Finder, Distributor, }
