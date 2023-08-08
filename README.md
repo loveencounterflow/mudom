@@ -90,6 +90,19 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 * **[–]** don't reference `µ` from with libraries, use private ref to avoid name collisions
 * **[–]** in `LINE.Distributor::constructor`, we create a `Finder` instance only to insert the Linefinder
   stylesheet; doing it this way means the document in the iframe gets multiple copies
+* **[–]** `µ.LINE`: find better name for 'main' document (which contains the iframes with views into the
+  'galley' document)
+* **[–]** `µ.LINE`: find better a name for the iframe elements (like 'window (to galley)'? 'view (of
+  galley)'?)
+* **[–]** `µ.LINE`: to simplify talking about document construction and to abstract from the implementation
+  detail that we are using `<iframe>`s, consider to implement a custom element class. This would also give a
+  chance to gloss over the somehat intricate `iframe.contentDocument.documentElement` &c shenanigans
+  * as described in
+    * https://stackoverflow.com/questions/53480991/creating-custom-node-to-extend-htmliframeelement
+    * https://learn.liferay.com/w/dxp/building-applications/client-extensions/front-end-client-extensions/understanding-custom-element-and-iframe-client-extensions
+    * https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements
+* **[–]** `µ.LINE`: provide a separate repo (but not necessarily NPM package?) for example Linefinder
+  projects; as initial offering, make it a pared-down copy of existing galley demo in `playlist`
 
 
 

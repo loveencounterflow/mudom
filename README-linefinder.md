@@ -2,17 +2,18 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [`µ.LINE`: Distribute Lines across HTML IFrames](#%C2%B5line-distribute-lines-across-html-iframes)
+- [`µ.LINE`: Distribute Lines across HTML iFrames](#%C2%B5line-distribute-lines-across-html-iframes)
   - [How it Works and What it Does](#how-it-works-and-what-it-does)
   - [`µ.LINE.Finder`](#%C2%B5linefinder)
     - [Configuration](#configuration)
+  - [Structure of a Document](#structure-of-a-document)
   - [`µ.LINE.Distributor`](#%C2%B5linedistributor)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 
-# `µ.LINE`: Distribute Lines across HTML IFrames
+# `µ.LINE`: Distribute Lines across HTML iFrames
 
 ## How it Works and What it Does
 
@@ -45,7 +46,7 @@
   'link[href$="reset.css"]'` with the default styles for the `mu-linemarker` and `mu-linecover` elements.
   *Note* that the selector can match one or more elements; only the first match will be considered.
 
-The CSS rules defined in the injected stylesheet are:
+The CSS rules defined in the injected stylesheet for iFrames, linemarkers and linecovers are:
 
 ```css
 /* for normal look: */
@@ -68,10 +69,51 @@ button#${debug_button_id} { ... }
 ## Structure of a Document
 
 * two HTML files:
-  * the 'galley' which (by defaut) contains a `<mu-galley> ... </mu-galley>` element (user-defined tag with CSS
-    `display: block;`)
+  * the 'galley' document which contains a `<mu-galley>` element (user-defined tag with CSS `display:
+    block;`); the nodes directly under this (and their child nodes) will be traversed by a `µ.LINE.Finder`
+    instance in (hopefully) the intended reading order.
+  * the 'main' document which contains any number of `<iframe>` elements the `src` attribute of which should
+    point to the same galley document.
 
+Sample code:
 
+```coffee
+µ.DOM.ready ->
+  ### (1) ###
+  cfg =
+    paragraph_selector:         'mu-galley > p'
+    iframe_selector:            'iframe'
+    insert_stylesheet_after:    'link[href$="reset.css"]'
+    insert_debug_button:        true
+  #.........................................................................................................
+  ### (2) ###
+  if ( not µ.DOM.page_is_inside_iframe() ) and ( µ.DOM.select_first 'mu-galley', null )?
+    distributor = new µ.LINE.Distributor cfg
+    await distributor.mark_lines()
+    return null
+  #.........................................................................................................
+  ### (3) ###
+  return null unless  µ.LINE.Distributor.is_main_document()
+  #.........................................................................................................
+  ### (4) ###
+  distributor = new µ.LINE.Distributor cfg
+  await distributor.distribute_lines()
+  return null
+```
+
+* **(1)** Configuration values, valid for both the galley and the main document.
+
+* **(2)** Here we test whether the current document is the standalone galley document (i.e. not displayed
+  inside an iframe). If so, instantiate a `LINE.Distributor` instance and mark lines; the linemarkers in the
+  galley document are only for debugging and demonstration and so the call to `distributor.mark_lines()` may
+  be skipped.
+
+* **(3)** Do not continue unless we are in main document.
+
+* **(4)** If in main document, instantiate a distributor and await the finishing of
+  `distributor.distribute_lines()`. This call is asynchronous so can be watched live. The default style has
+  transparent linemarkers and opaque white linecovers; when debugging is activated, their are displayed with
+  translucent yellow and red backgrounds.
 
 ## `µ.LINE.Distributor`
 
