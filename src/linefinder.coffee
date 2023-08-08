@@ -20,7 +20,7 @@ defaults.finder_cfg =
   line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
 #...........................................................................................................
 defaults.distributor_cfg =
-  paragraph_selector:       'galley > p'
+  paragraph_selector:       'mu-galley > p'
   iframe_selector:          'iframe'
   iframe_scrolling:         false
   insert_debug_button:      true

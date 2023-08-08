@@ -22,10 +22,10 @@
 
 ### Configuration
 
-* **`linemarker_tagname`** (`'pl-linemarker'`): Which HTML tag name to use when drawing a rectangle for each
+* **`linemarker_tagname`** (`'mu-linemarker'`): Which HTML tag name to use when drawing a rectangle for each
   line of text. These are normally transparent (hence invisible) but can be made visible for debugging.
 
-* **`linecover_tagname`** (`'pl-linecover'`): Which HTML tag name to use for the rectangles that are used to
+* **`linecover_tagname`** (`'mu-linecover'`): Which HTML tag name to use for the rectangles that are used to
   cover the first line of text in an `iframe` that is only partially visible. This will normally be without
   outline and opaque white to 'erase' the line in question, but can be made visible for debugging.
 
@@ -42,7 +42,7 @@
   methods are provided that accept either a CSS selector or a DOM element to determine the insertion point.
   For example, if you have a linked CSS-Reset stylesheet, you typically want to have that to be the first
   stylesheet with all the defaults; it would then be appropriate to call `finder.inject_stylesheet_after
-  'link[href$="reset.css"]'` with the default styles for the `pl-linemarker` and `pl-linecover` elements.
+  'link[href$="reset.css"]'` with the default styles for the `mu-linemarker` and `mu-linecover` elements.
   *Note* that the selector can match one or more elements; only the first match will be considered.
 
 The CSS rules defined in the injected stylesheet are:
@@ -64,6 +64,12 @@ The debug button has these style selectors:
 button#${debug_button_id} { ... }
 @media print { button#${debug_button_id} { ... } }
 ```
+
+## Structure of a Document
+
+* two HTML files:
+  * the 'galley' which (by defaut) contains a `<mu-galley> ... </mu-galley>` element (user-defined tag with CSS
+    `display: block;`)
 
 
 
