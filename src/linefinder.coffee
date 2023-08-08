@@ -158,7 +158,6 @@ class Finder
     ### TAINT code duplication ###
     element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
     stylesheet  = @_get_stylesheet()
-    log '^535453^', stylesheet
     switch where
       when 'before' then µ.DOM.insert_before  element, stylesheet
       when 'after'  then µ.DOM.insert_after   element, stylesheet
@@ -325,13 +324,13 @@ class Distributor
       break if ø_iframe.done
       #.....................................................................................................
       unless ø_node.step()? # might want to mark galleys without content at this point
-        log '^123-1^', "nodes done"; break
+        break
       #.....................................................................................................
       await defer()
       ø_slug = new Slug_walker linefinder.walk_slugs_of_node ø_node.value
       loop
         unless ø_slug.step()?
-          log '^123-1^', "slugs done"; break
+          break
         await defer()
         #...................................................................................................
         unless column?.first_slug?
@@ -346,7 +345,7 @@ class Distributor
         ø_iframe.draw_line_cover ø_slug.value.rectangle
         column    = null
         unless ø_iframe.step()?
-          log '^123-1^', "iframes done"; break
+          break
         ø_iframe.draw_box ø_slug.value.rectangle
         column = new Column ø_iframe, ø_slug
         column.scroll_to_first_line()
@@ -361,13 +360,13 @@ class Distributor
     loop
       #.....................................................................................................
       unless ø_node.step()? # might want to mark galleys without content at this point
-        log '^123-1^', "nodes done"; break
+        break
       #.....................................................................................................
       await defer()
       ø_slug = new Slug_walker linefinder.walk_slugs_of_node ø_node.value
       loop
         unless ø_slug.step()?
-          log '^123-1^', "slugs done"; break
+          break
         await defer()
         linefinder.draw_box ø_slug.value.rectangle
     #.......................................................................................................
@@ -375,7 +374,6 @@ class Distributor
 
   #---------------------------------------------------------------------------------------------------------
   insert_debug_button: ->
-    log '^236473627^', @_get_debug_button()
     µ.DOM.insert_as_first ( µ.DOM.select_first 'body' ), @_get_debug_button()
     return null
 
