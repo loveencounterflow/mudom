@@ -17,17 +17,17 @@ defaults.finder_cfg =
   ### TAINT inconsistent naming ###
   linemarker_tagname:       'pl-linemarker'
   linecover_tagname:        'pl-linecover'
-  debug_class_name:         'debug'
-  debug_button_id:          'pl-debugbutton'
   line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
-  insert_stylesheet_after:  null
-  insert_stylesheet_before: null
 #...........................................................................................................
 defaults.distributor_cfg =
   paragraph_selector:       'galley > p'
   iframe_selector:          'iframe'
   iframe_scrolling:         false
   insert_debug_button:      true
+  debug_class_name:         'debug'
+  debug_button_id:          'pl-debugbutton'
+  insert_stylesheet_after:  null
+  insert_stylesheet_before: null
 defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
 
 
@@ -48,8 +48,6 @@ class Finder
   constructor: ( cfg ) ->
     ### TAINT use intertype ###
     @cfg = Object.freeze { defaults.finder_cfg..., cfg..., }
-    @_insert_stylesheet   'after',  @cfg.insert_stylesheet_after    if @cfg.insert_stylesheet_after?
-    @_insert_stylesheet   'before', @cfg.insert_stylesheet_before   if @cfg.insert_stylesheet_before?
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -149,59 +147,6 @@ class Finder
       yield new Slug { llnr, rlnr, node, rectangle, }
     return null
 
-  #---------------------------------------------------------------------------------------------------------
-  insert_stylesheet_before:   ( element_or_selector ) -> @_insert_stylesheet   'before', element_or_selector
-  insert_stylesheet_after:    ( element_or_selector ) -> @_insert_stylesheet   'after',  element_or_selector
-
-  #---------------------------------------------------------------------------------------------------------
-  _insert_stylesheet: ( where, ref ) ->
-    ### TAINT code duplication ###
-    element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
-    stylesheet  = @_get_stylesheet()
-    switch where
-      when 'before' then µ.DOM.insert_before  element, stylesheet
-      when 'after'  then µ.DOM.insert_after   element, stylesheet
-      else "unknown location #{µ.TEXT.rpr where}"
-    return null
-
-  #---------------------------------------------------------------------------------------------------------
-  _get_stylesheet: ->
-    ### TAINT must honour element, class name configuration ###
-    ### https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/insertRule ###
-    return µ.DOM.new_stylesheet """
-      .#{@cfg.debug_class_name} iframe {
-        outline:                1px dotted red; }
-
-      #{@cfg.linemarker_tagname} {
-        background-color:       transparent;
-        pointer-events:         none;
-        position:               absolute; }
-
-      .#{@cfg.debug_class_name} #{@cfg.linemarker_tagname} {
-        background-color:       rgba( 255, 248, 0, 0.2 );
-        outline:                1px solid rgba( 255, 0, 0, 0.2 );
-        mix-blend-mode:         multiply; }
-
-      #{@cfg.linecover_tagname} {
-        background-color:       white;
-        pointer-events:         none;
-        position:               absolute; }
-
-      .#{@cfg.debug_class_name} #{@cfg.linecover_tagname} {
-        background-color:       rgba( 255, 0, 0, 0.2 );
-        mix-blend-mode:         multiply; }
-
-      /* ### TAINT replace magic numbers */
-      button##{@cfg.debug_button_id} {
-        position:               fixed;
-        top:                    3mm;
-        left:                   95mm; }
-
-      @media print {
-        button##{@cfg.debug_button_id} {
-          display: none !important; } }
-      """
-
 
 #===========================================================================================================
 class Column
@@ -299,9 +244,11 @@ class Distributor
   constructor: ( cfg ) ->
     ### TAINT use `intertype` ###
     @cfg = Object.freeze { defaults.distributor_cfg..., cfg..., }
-    ### TAINT we create this object only to insert the Linefinder stylesheet ###
-    ### TAINT doing it this way means the document in the iframe gets multiple copies ###
-    dummy_linefinder = new Finder @cfg
+    @_insert_stylesheet   'after',  @cfg.insert_stylesheet_after    if @cfg.insert_stylesheet_after?
+    @_insert_stylesheet   'before', @cfg.insert_stylesheet_before   if @cfg.insert_stylesheet_before?
+    for ø_iframe from @new_iframe_walker()
+      galley_µ = ø_iframe.window.µ
+      new galley_µ.LINE.Distributor @cfg
     @insert_debug_button() if @cfg.insert_debug_button
     return undefined
 
@@ -371,6 +318,63 @@ class Distributor
         linefinder.draw_box ø_slug.value.rectangle
     #.......................................................................................................
     return null
+
+
+  #=========================================================================================================
+  # INSERTION OF STYLESHEET, DEBUG BUTTON
+  #---------------------------------------------------------------------------------------------------------
+  insert_stylesheet_before:   ( element_or_selector ) -> @_insert_stylesheet   'before', element_or_selector
+  insert_stylesheet_after:    ( element_or_selector ) -> @_insert_stylesheet   'after',  element_or_selector
+
+  #---------------------------------------------------------------------------------------------------------
+  _insert_stylesheet: ( where, ref ) ->
+    ### TAINT code duplication ###
+    element     = if typeof ref is 'string' then ( µ.DOM.select_first ref ) else ref
+    stylesheet  = @_get_stylesheet()
+    switch where
+      when 'before' then µ.DOM.insert_before  element, stylesheet
+      when 'after'  then µ.DOM.insert_after   element, stylesheet
+      else "unknown location #{µ.TEXT.rpr where}"
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _get_stylesheet: ->
+    ### TAINT must honour element, class name configuration ###
+    ### https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/insertRule ###
+    return µ.DOM.new_stylesheet """
+      /* stylesheet inserted by mudom `LINE.Distributor` */
+      .#{@cfg.debug_class_name} iframe {
+        outline:                1px dotted red; }
+
+      #{@cfg.linemarker_tagname} {
+        background-color:       transparent;
+        pointer-events:         none;
+        position:               absolute; }
+
+      .#{@cfg.debug_class_name} #{@cfg.linemarker_tagname} {
+        background-color:       rgba( 255, 248, 0, 0.2 );
+        outline:                1px solid rgba( 255, 0, 0, 0.2 );
+        mix-blend-mode:         multiply; }
+
+      #{@cfg.linecover_tagname} {
+        background-color:       white;
+        pointer-events:         none;
+        position:               absolute; }
+
+      .#{@cfg.debug_class_name} #{@cfg.linecover_tagname} {
+        background-color:       rgba( 255, 0, 0, 0.2 );
+        mix-blend-mode:         multiply; }
+
+      /* ### TAINT replace magic numbers */
+      button##{@cfg.debug_button_id} {
+        position:               fixed;
+        top:                    3mm;
+        left:                   95mm; }
+
+      @media print {
+        button##{@cfg.debug_button_id} {
+          display: none !important; } }
+      """
 
   #---------------------------------------------------------------------------------------------------------
   insert_debug_button: ->
