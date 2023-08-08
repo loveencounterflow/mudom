@@ -15,8 +15,8 @@ defaults = {}
 #...........................................................................................................
 defaults.finder_cfg =
   ### TAINT inconsistent naming ###
-  linemarker_tagname:       'pl-linemarker'
-  linecover_tagname:        'pl-linecover'
+  linemarker_tagname:       'mu-linemarker'
+  linecover_tagname:        'mu-linecover'
   line_step_factor:         1 / 2 ### relative minimum height to recognize line step ###
 #...........................................................................................................
 defaults.distributor_cfg =
@@ -25,7 +25,7 @@ defaults.distributor_cfg =
   iframe_scrolling:         false
   insert_debug_button:      true
   debug_class_name:         'debug'
-  debug_button_id:          'pl-debugbutton'
+  debug_button_id:          'mu-debugbutton'
   insert_stylesheet_after:  null
   insert_stylesheet_before: null
 defaults.distributor_cfg = { defaults.finder_cfg..., defaults.distributor_cfg..., }
