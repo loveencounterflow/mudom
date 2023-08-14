@@ -393,7 +393,6 @@ class Dom # extends Multimix
 @_magic     = Symbol.for 'µDOM'
 @TEXT       = new Text()
 @DOM        = new Dom()
-@LINE       = require './linefinder'
 @KB         = new ( require './kb' ).Kb()
 
 
