@@ -3,8 +3,7 @@
 loupe                     = require '../loupe.js'
 misfit                    = Symbol 'misfit'
 debug                     = console.debug
-{ types
-  isa
+{ isa
   validate }              = require './types'
 
 #-----------------------------------------------------------------------------------------------------------
