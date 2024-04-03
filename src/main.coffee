@@ -5,6 +5,7 @@ misfit                    = Symbol 'misfit'
 debug                     = console.debug
 { isa
   validate }              = require './types'
+µ                         = @
 
 #-----------------------------------------------------------------------------------------------------------
 INTERTEXT =
@@ -428,10 +429,10 @@ class Dom # extends Multimix
 #===========================================================================================================
 # MAGIC
 #-----------------------------------------------------------------------------------------------------------
-@_magic     = Symbol.for 'µDOM'
-@TEXT       = new Text()
-@DOM        = new Dom()
-@KB         = new ( require './kb' ).Kb()
+µ._magic    = Symbol.for 'µDOM'
+µ.TEXT      = new Text()
+µ.DOM       = new Dom()
+µ.KB        = new ( require './kb' ).Kb()
 
 
 # module.exports.rpr     ?= module.exports.µ.TEXT.rpr.bind( µ.TEXT )
