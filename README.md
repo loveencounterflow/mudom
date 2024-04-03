@@ -13,7 +13,6 @@
 - [API](#api)
   - [DOM](#dom)
   - [TEXT](#text)
-  - [LINE](#line)
   - [KB](#kb)
 - [How to Use It](#how-to-use-it)
 - [To Do](#to-do)
@@ -81,6 +80,22 @@ Demo on https://loveencounterflow.github.io/hengist/dev/mudom/static/index.html
 * **[–]** ??? allow to pass in `document` on creation as it can differ from main document within iframes
 * **[–]** don't reference `µ` from with libraries, use private ref to avoid name collisions
 * **[–]** move `loupe.js` to `deps`
+* **[–]** integrate method to monitor all events in document or on given element as discussed in
+  https://stackoverflow.com/a/72945018:
 
+  ```js
+  for (const key in document) if (key.startsWith('on')) document.addEventListener(key.slice(2), console.log);
+  ```
+
+  ```js
+  // https://stackoverflow.com/a/72945018/319266
+  function monitorEvents(element) {
+    for (const key in element) {
+      if (key.startsWith('on')) {
+        element.addEventListener(key.slice(2), console.log);
+      }
+    }
+  }
+  ```
 
 
